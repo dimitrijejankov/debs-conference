@@ -9,7 +9,7 @@
 #include <amqp.h>
 #include <amqp_tcp_socket.h>
 #include <sys/socket.h>
-#include "parser.h"
+#include "rdf_parser.h"
 #include "utils.h"
 
 struct channel {
@@ -31,6 +31,12 @@ private:
     // port
     int port;
 
+    // returns the input queue name
+    string input_queue_name();
+
+    // returns the output queue name
+    string output_queue_name();
+
     // the input channel
     channel in_channel;
 
@@ -43,11 +49,7 @@ private:
     // initialize the queue
     void init_queue(channel &c, queue &q, string queue_name);
 
-    // returns the input queue name
-    string input_queue_name();
-
-    // returns the output queue name
-    string output_queue_name();
+    rdf_parser *parser;
 
 public:
 

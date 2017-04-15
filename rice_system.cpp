@@ -2,6 +2,7 @@
 // Created by dimitrije on 14/04/17.
 //
 
+#include <cstring>
 #include "rice_system.h"
 #include "parameters.h"
 
@@ -64,6 +65,11 @@ rice_system::rice_system() {
 
     // init the input queue
     init_queue(in_channel, in_queue, input_queue_name());
+
+    // init the parser
+    parser = new rdf_parser([](int machine_idx, int dimension, int timestamp_idx, double value) {
+        printf("Machine index %d, dimension %d, timestamp %d, value %f\n", machine_idx, dimension, timestamp_idx, value);
+    });
 }
 
 void rice_system::run() {
@@ -75,6 +81,7 @@ void rice_system::run() {
     amqp_basic_consume(in_channel.conn, 1, amqp_cstring_bytes(in_name.c_str()), amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
     die_on_amqp_error(amqp_get_rpc_reply(in_channel.conn), "Consuming");
 
+    // TODO add the command queue here and move the input queue to another thread
     {
         for (;;) {
             amqp_rpc_reply_t res;
@@ -88,19 +95,8 @@ void rice_system::run() {
                 break;
             }
 
-            printf("Delivery %u, exchange %.*s routingkey %.*s\n",
-                   (unsigned) envelope.delivery_tag,
-                   (int) envelope.exchange.len, (char *) envelope.exchange.bytes,
-                   (int) envelope.routing_key.len, (char *) envelope.routing_key.bytes);
-
-            if (envelope.message.properties._flags & AMQP_BASIC_CONTENT_TYPE_FLAG) {
-                printf("Content-type: %.*s\n",
-                       (int) envelope.message.properties.content_type.len,
-                       (char *) envelope.message.properties.content_type.bytes);
-            }
-            printf("----\n");
-
-            amqp_dump(envelope.message.body.bytes, envelope.message.body.len);
+            // parse the input..
+            parser->parse((char*)envelope.message.body.bytes, envelope.message.body.len);
 
             amqp_destroy_envelope(&envelope);
         }
@@ -116,4 +112,7 @@ rice_system::~rice_system() {
 
     // destroy the connection
     die_on_error(amqp_destroy_connection(in_channel.conn), "Ending connection");
+
+    // free the parser
+    delete parser;
 }
