@@ -11,25 +11,11 @@
 #include <sys/socket.h>
 #include "rdf_parser.h"
 #include "utils.h"
+#include "component.h"
 
-struct channel {
-    amqp_socket_t *socket;
-    amqp_connection_state_t conn;
-    int status;
-};
 
-class queue {
-    string name;
-};
-
-class rice_system {
+class rice_system : public component {
 private:
-
-    // the rabbit mq hostname
-    string hostname;
-
-    // port
-    int port;
 
     // returns the input queue name
     string input_queue_name();
@@ -42,12 +28,6 @@ private:
 
     // the input queue
     queue in_queue;
-
-    // initialize the channel
-    void init_channel(channel &c);
-
-    // initialize the queue
-    void init_queue(channel &c, queue &q, string queue_name);
 
     rdf_parser *parser;
 
