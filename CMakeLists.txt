@@ -22,7 +22,7 @@ endif()
 set(CMAKE_REQUIRED_INCLUDES ${RABBITMQ_HEADERS})
 
 # set the sources
-set(SOURCE_FILES main.cpp parameters.h)
+set(SOURCE_FILES parameters.h parameters.cpp parser.h parser.cpp rice_system.h rice_system.cpp utils.cpp utils.h main.cpp)
 
 # set the executable
 add_executable(HobbitRewrite ${SOURCE_FILES})

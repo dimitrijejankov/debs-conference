@@ -1,6 +1,8 @@
 #ifndef HOBBITREWRITE_PARAMETERS_H
 #define HOBBITREWRITE_PARAMETERS_H
 
+#include <string>
+
 #define ENVIRONMENT LOCAL
 #define LOCAL  1
 #define HOBBIT 2
@@ -8,48 +10,28 @@
 #include <iostream>
 
 // get the system URI
-const char * SYSTEM_URI() {
-#if ENVIRONMENT == LOCAL
-    return "http://project-hobbit.eu/resources/debs2017/debsparrotsystemexample";
-#elif ENVIRONMENT == HOBBIT
-    return std::getenv("HOBBIT_SYSTEM_URI");
-#endif
-}
+std::string SYSTEM_URI();
 
 // get the rabbit mq host name
-const char *RABBIT_MQ_HOST_NAME() {
-#if ENVIRONMENT == LOCAL
-    return "localhost";
-#elif ENVIRONMENT == HOBBIT
-    return std::getenv("HOBBIT_SYSTEM_URI");
-#endif
-}
+std::string RABBIT_MQ_HOST_NAME();
+
+// the default port for the connection
+int RABBIT_MQ_PORT();
 
 // get the hobbit session id
-const char *HOBBIT_SESSION_ID() {
-#if ENVIRONMENT == LOCAL
-    return "exp1";
-#elif ENVIRONMENT == HOBBIT
-    return std::getenv("HOBBIT_SESSION_ID");
-#endif
-}
+std::string HOBBIT_SESSION_ID();
 
 // get the system parameters model
-const char *SYSTEM_PARAMETERS_MODEL() {
-#if ENVIRONMENT == LOCAL
-    return "{}";
-#elif ENVIRONMENT == HOBBIT
-    return std::getenv("SYSTEM_PARAMETERS_MODEL");
-#endif
-}
+std::string SYSTEM_PARAMETERS_MODEL();
 
 // get the experiment uri
-const char *HOBBIT_EXPERIMENT_URI() {
-#if ENVIRONMENT == LOCAL
-    return "http://example.com/exp1";
-#elif ENVIRONMENT == HOBBIT
-    return std::getenv("HOBBIT_EXPERIMENT_URI");
-#endif
-}
+std::string HOBBIT_EXPERIMENT_URI();
+
+// get the input queue name
+std::string DATA_GEN_2_SYSTEM_QUEUE_NAME();
+
+// get the output queue name
+std::string SYSTEM_2_EVAL_STORAGE_QUEUE_NAME();
+
 
 #endif //HOBBITREWRITE_PARAMETERS_H
