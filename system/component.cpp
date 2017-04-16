@@ -69,7 +69,7 @@ void component::bind_exchange(channel &c, queue &q, string &queue, string &excha
 
     // declare the exchange
     amqp_exchange_declare(c.conn, 1, amqp_cstring_bytes(exchange.c_str()), amqp_cstring_bytes("fanout"),
-                          0, 0, 0, 0, amqp_empty_table);
+                          0, 0, 1, 0, amqp_empty_table);
 
     // exit if error
     die_on_amqp_error(amqp_get_rpc_reply(c.conn), "Declaring exchange");
