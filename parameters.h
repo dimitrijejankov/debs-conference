@@ -36,4 +36,7 @@ std::string SYSTEM_2_EVAL_STORAGE_QUEUE_NAME();
 // get hobbit command exchange name
 std::string HOBBIT_COMMAND_EXCHANGE_NAME();
 
+// the termination message
+const char TERMINATION_MESSAGE[] = "~~Termination Message~~";
+
 #endif //HOBBITREWRITE_PARAMETERS_H

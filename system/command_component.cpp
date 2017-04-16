@@ -85,11 +85,6 @@ void command_component::send_to_cmd_queue(char command, char *data, size_t lengt
 
 void command_component::run() {
 
-    printf("Sending SYSTEM_READY_SIGNAL...");
-
-    // send the system ready signal...
-    send_to_cmd_queue(SYSTEM_READY_SIGNAL);
-
     // start the consuming
     amqp_basic_consume(response_channel.conn, 1, amqp_cstring_bytes(response_queue_name.c_str()), amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
     die_on_amqp_error(amqp_get_rpc_reply(response_channel.conn), "Consuming");
@@ -154,8 +149,21 @@ void command_component::handle_command(char* bytes, size_t length, amqp_basic_pr
 void command_component::receive_command(char command, char *remainingData, size_t length) {
     if (command == DOCKER_CONTAINER_TERMINATED) {
         // TODO implement container observers
+        printf("DOCKER_CONTAINER_TERMINATED");
     }
     else if (command == TASK_GENERATION_FINISHED) {
         task_generation_finished = true;
+        printf("TASK_GENERATION_FINISHED");
     }
+}
+
+command_component::~command_component() {
+    // close the channel
+    die_on_amqp_error(amqp_channel_close(response_channel.conn, 1, AMQP_REPLY_SUCCESS), "Closing channel");
+
+    // close the connection
+    die_on_amqp_error(amqp_connection_close(response_channel.conn, AMQP_REPLY_SUCCESS), "Closing connection");
+
+    // destroy the connection
+    die_on_error(amqp_destroy_connection(response_channel.conn), "Ending connection");
 }

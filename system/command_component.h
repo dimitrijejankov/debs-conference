@@ -29,10 +29,10 @@ const char START_BENCHMARK_SIGNAL = 17;
 
 class command_component : public component {
 protected:
-    // the input channel
+    // the response channel
     channel response_channel;
 
-    // the input queue
+    // the response queue
     queue response_queue;
 
     // session id
@@ -54,6 +54,9 @@ public:
 
     // constructor
     command_component();
+
+    // destructor
+    ~command_component();
 
     // receive command
     void receive_command(char command, char* remainingData, size_t length);

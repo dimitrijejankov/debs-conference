@@ -14,19 +14,20 @@
 #include "component.h"
 #include "input_component.h"
 #include "command_component.h"
+#include "output_component.h"
 
 using namespace std;
 
 class rice_system {
 private:
 
-    // returns the output queue name
-    string output_queue_name();
-
     // the input component
     input_component ic;
 
-    // the command receiver
+    // the output component
+    output_component oc;
+
+    // the command component
     command_component cr;
 
     // mutex to sync the system

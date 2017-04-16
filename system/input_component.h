@@ -9,8 +9,6 @@
 #include "component.h"
 #include "rdf_parser.h"
 
-const char TERMINATION_MESSAGE[] = "~~Termination Message~~";
-
 class input_component : public component {
 protected:
     // returns the input queue name

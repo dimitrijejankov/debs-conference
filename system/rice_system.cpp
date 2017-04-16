@@ -10,10 +10,6 @@
 #include "parameters.h"
 
 
-string rice_system::output_queue_name() {
-    return SYSTEM_2_EVAL_STORAGE_QUEUE_NAME() + "." + HOBBIT_SESSION_ID();
-}
-
 rice_system::rice_system() {
 
 }
@@ -33,14 +29,19 @@ void rice_system::run() {
         this->cr.run();
     });
 
+    // log the action
+    printf("Sending SYSTEM_READY_SIGNAL...\n");
+
     // send the system ready signal
     cr.send_to_cmd_queue(SYSTEM_READY_SIGNAL);
+
+    printf("Waiting for termination message...\n");
 
     // make a conditional variable flow until we finish...
     cv.wait(lk, [this]{return this->ic.is_finished();});
 
-    // TODO send TERMINATION_MESSAGE to the output queue
-    // output(TERMINATION_MESSAGE)
+    printf("Sending termination message...\n");
+    oc.send(TERMINATION_MESSAGE);
 }
 
 rice_system::~rice_system() {}
