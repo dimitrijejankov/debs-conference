@@ -2,6 +2,9 @@
 #ifndef librabbitmq_examples_utils_h
 #define librabbitmq_examples_utils_h
 
+#include "cstddef"
+#include "cstdint"
+
 /*
  * ***** BEGIN LICENSE BLOCK *****
  * Version: MIT

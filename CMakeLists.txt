@@ -5,6 +5,9 @@ include(CheckCSourceCompiles)
 # set the standard to C++ 11
 set(CMAKE_CXX_STANDARD 11)
 
+#find pthreads
+find_package (Threads)
+
 # find the RabbitMQ
 find_library(RABBITMQ_LIBRARIES NAMES rabbitmq)
 find_path(RABBITMQ_HEADERS amqp.h)
@@ -18,14 +21,26 @@ else()
     message(STATUS "Found RabbitMQ library: ${RABBITMQ_LIBRARIES}")
 endif()
 
+# set the include directories
+include_directories(parser system .)
+
 # if found include the RabbitMQ
 set(CMAKE_REQUIRED_INCLUDES ${RABBITMQ_HEADERS})
 
+# grab the source files
+file(GLOB PROJECT_SOURCE "system/*.cpp" "parser/*.cpp" "*.cpp")
+
+# grab the headers files
+file(GLOB PROJECT_HEADERS "system/*.h" "parser/*.h" "*.h")
+
 # set the sources
-set(SOURCE_FILES parameters.h parameters.cpp rdf_parser.h rdf_parser.cpp rice_system.h rice_system.cpp utils.cpp utils.h main.cpp)
+set(SOURCE_FILES ${PROJECT_SOURCE} ${PROJECT_HEADERS})
 
 # set the executable
 add_executable(HobbitRewrite ${SOURCE_FILES})
 
 # link rabbitmq
 target_link_libraries(HobbitRewrite ${RABBITMQ_LIBRARIES})
+
+# link pthreads
+target_link_libraries (HobbitRewrite ${CMAKE_THREAD_LIBS_INIT})

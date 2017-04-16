@@ -12,24 +12,28 @@
 #include "rdf_parser.h"
 #include "utils.h"
 #include "component.h"
+#include "input_component.h"
+#include "command_component.h"
 
+using namespace std;
 
-class rice_system : public component {
+class rice_system {
 private:
-
-    // returns the input queue name
-    string input_queue_name();
 
     // returns the output queue name
     string output_queue_name();
 
-    // the input channel
-    channel in_channel;
+    // the input component
+    input_component ic;
 
-    // the input queue
-    queue in_queue;
+    // the command receiver
+    command_component cr;
 
-    rdf_parser *parser;
+    // mutex to sync the system
+    mutex m;
+
+    // conditional variable to sync the system
+    condition_variable cv;
 
 public:
 

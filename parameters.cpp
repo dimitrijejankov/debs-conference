@@ -27,7 +27,11 @@ std::string HOBBIT_SESSION_ID() {
 #if ENVIRONMENT == LOCAL
     return "exp1";
 #elif ENVIRONMENT == HOBBIT
-    return std::getenv("HOBBIT_SESSION_ID");
+    if (std::getenv("HOBBIT_SESSION_ID") != NULL) {
+        return std::getenv("HOBBIT_SESSION_ID");
+    }
+
+    return "SYSTEM";
 #endif
 }
 
@@ -57,4 +61,9 @@ std::string DATA_GEN_2_SYSTEM_QUEUE_NAME() {
 // get the output queue name
 std::string SYSTEM_2_EVAL_STORAGE_QUEUE_NAME() {
     return "hobbit.system-evalstore";
+}
+
+// get hobbit command exchange name
+std::string HOBBIT_COMMAND_EXCHANGE_NAME() {
+    return "hobbit.command";
 }

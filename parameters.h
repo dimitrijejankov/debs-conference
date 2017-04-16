@@ -33,5 +33,7 @@ std::string DATA_GEN_2_SYSTEM_QUEUE_NAME();
 // get the output queue name
 std::string SYSTEM_2_EVAL_STORAGE_QUEUE_NAME();
 
+// get hobbit command exchange name
+std::string HOBBIT_COMMAND_EXCHANGE_NAME();
 
 #endif //HOBBITREWRITE_PARAMETERS_H

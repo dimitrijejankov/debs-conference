@@ -18,6 +18,7 @@ struct channel {
 
 class queue {
     string name;
+    string exchange;
 };
 
 class component {
@@ -37,6 +38,11 @@ protected:
 
     // initialize the queue
     void init_queue(channel &c, queue &q, string queue_name);
+
+    // initialize anonymous queue
+    string init_queue(channel &c, queue &q);
+
+    void bind_exchange(channel &c, queue &q, string &queue, string &exchange);
 };
 
 

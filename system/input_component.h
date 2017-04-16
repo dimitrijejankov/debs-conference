@@ -5,12 +5,41 @@
 #ifndef HOBBITREWRITE_INPUT_THREAD_H
 #define HOBBITREWRITE_INPUT_THREAD_H
 
+#include <condition_variable>
+#include "component.h"
+#include "rdf_parser.h"
 
-class input_thread {
+const char TERMINATION_MESSAGE[] = "~~Termination Message~~";
+
+class input_component : public component {
+protected:
+    // returns the input queue name
+    string input_queue_name();
+
+    // the input channel
+    channel in_channel;
+
+    // the input queue
+    queue in_queue;
+
+    // the rdf parser
+    rdf_parser *parser;
+
+    // finished
+    bool finished;
+
 public:
-    input_thread();
 
+    // constructor
+    input_component();
 
+    // destructor
+    ~input_component();
+
+    // runs the system
+    void run(condition_variable &cv, mutex &m);
+
+    bool is_finished();
 };
 
 
