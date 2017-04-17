@@ -66,10 +66,10 @@ void input_component::run(condition_variable &cv, mutex &m) {
         }
 
         // if we got a termination message we notify the main thread about it...
-        if(strcmp(TERMINATION_MESSAGE, (char*)envelope.message.body.bytes) == 0) {
-            std::unique_lock<std::mutex> lk(m);
+        if(strncmp(TERMINATION_MESSAGE, (char*)envelope.message.body.bytes, TERMINATION_MESSAGE_SIZE) == 0) {
+            m.lock();
             finished = true;
-            lk.unlock();
+            m.unlock();
             cv.notify_one();
         }
         // otherwise we parse the input

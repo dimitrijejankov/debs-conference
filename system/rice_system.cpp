@@ -24,10 +24,16 @@ void rice_system::run() {
         this->ic.run(this->cv, this->m);
     });
 
-    // run the input component
+    // detach the input thread
+    input_thread.detach();
+
+    // run the command component
     std::thread command_thread ([this]() {
         this->cr.run();
     });
+
+    // detach the command
+    command_thread.detach();
 
     // log the action
     printf("Sending SYSTEM_READY_SIGNAL...\n");

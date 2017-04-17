@@ -39,4 +39,7 @@ std::string HOBBIT_COMMAND_EXCHANGE_NAME();
 // the termination message
 const char TERMINATION_MESSAGE[] = "~~Termination Message~~";
 
+// size of the termination message
+const int TERMINATION_MESSAGE_SIZE = 23;
+
 #endif //HOBBITREWRITE_PARAMETERS_H

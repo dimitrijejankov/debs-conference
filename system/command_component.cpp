@@ -92,7 +92,6 @@ void command_component::run() {
     amqp_basic_consume(response_channel.conn, 1, amqp_cstring_bytes(response_queue_name.c_str()), amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
     die_on_amqp_error(amqp_get_rpc_reply(response_channel.conn), "Consuming");
 
-    // TODO add the command queue here and move the input queue to another thread
     {
         for (;;) {
             amqp_rpc_reply_t res;
