@@ -73,6 +73,9 @@ public:
     // send the command and bytes to the command queue with properties
     void send_to_cmd_queue(char command, char *data, size_t length, amqp_basic_properties_t_ const *props);
 
+    // swap endian
+    inline void swap_endian(int32_t &value);
+
     void run();
 };
 

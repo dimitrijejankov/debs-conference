@@ -56,6 +56,9 @@ void command_component::send_to_cmd_queue(char command, char *data, size_t lengt
     // copy the session id length
     memcpy(buffer, &session_id_len, sizeof(int32_t));
 
+    // swap the endian in the buffer
+    swap_endian(*((int32_t*)buffer));
+
     // copy the session id
     memcpy(buffer + sizeof(int32_t), session_id.c_str(), session_id.size());
 
@@ -116,22 +119,24 @@ void command_component::handle_command(char* bytes, size_t length, amqp_basic_pr
     int32_t command_session_len;
 
     // figure out the length of the session id
-    memcpy(&command_session_len, bytes, sizeof(uint32_t));
+    memcpy(&command_session_len, bytes, sizeof(int32_t));
+
+    swap_endian(command_session_len);
 
     // grab the session id
-    string command_session_id = string(bytes + sizeof(uint32_t), (unsigned long) command_session_len);
+    string command_session_id = string(bytes + sizeof(int32_t), (unsigned long) command_session_len);
 
     // if the session id is accepted command headers
     if (accepted_command_headers.find(command_session_id) != accepted_command_headers.end()) {
 
         // get the command
-        char command = *(bytes + sizeof(uint32_t) + command_session_len);
+        char command = *(bytes + sizeof(int32_t) + command_session_len);
 
         // remaining data
         char* remainingData;
 
         // figure out the length
-        size_t remainingDataLen = length - sizeof(uint32_t) - command_session_len - sizeof(char);
+        size_t remainingDataLen = length - sizeof(int32_t) - command_session_len - sizeof(char);
 
         // if we have still data
         if (remainingDataLen > 0) {
@@ -149,11 +154,9 @@ void command_component::handle_command(char* bytes, size_t length, amqp_basic_pr
 void command_component::receive_command(char command, char *remainingData, size_t length) {
     if (command == DOCKER_CONTAINER_TERMINATED) {
         // TODO implement container observers
-        printf("DOCKER_CONTAINER_TERMINATED");
     }
     else if (command == TASK_GENERATION_FINISHED) {
         task_generation_finished = true;
-        printf("TASK_GENERATION_FINISHED");
     }
 }
 
@@ -166,4 +169,8 @@ command_component::~command_component() {
 
     // destroy the connection
     die_on_error(amqp_destroy_connection(response_channel.conn), "Ending connection");
+}
+
+void command_component::swap_endian(int32_t &value) {
+    value = ( value >> 24 ) | (( value << 8) & 0x00ff0000 )| ((value >> 8) & 0x0000ff00) | ( value << 24)  ;
 }
