@@ -28,10 +28,10 @@ include_directories(parser system .)
 set(CMAKE_REQUIRED_INCLUDES ${RABBITMQ_HEADERS})
 
 # grab the source files
-file(GLOB PROJECT_SOURCE "system/*.cpp" "parser/*.cpp" "*.cpp")
+file(GLOB PROJECT_SOURCE "system/*.cpp" "parser/*.cpp" "kmeans/*.cpp" "*.cpp")
 
 # grab the headers files
-file(GLOB PROJECT_HEADERS "system/*.h" "parser/*.h" "*.h")
+file(GLOB PROJECT_HEADERS "system/*.h" "parser/*.h" "kmeans/*.h" "*.h")
 
 # set the sources
 set(SOURCE_FILES ${PROJECT_SOURCE} ${PROJECT_HEADERS})
