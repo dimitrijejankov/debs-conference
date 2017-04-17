@@ -16,7 +16,7 @@ public:
     ~circular_queue();
 
     // get the entire data
-    inline point &point(size_t &idx);
+    inline point & get_point(size_t idx);
 
     // get the entire data
     inline point &next_point();

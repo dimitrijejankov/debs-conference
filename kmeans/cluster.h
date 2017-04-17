@@ -12,7 +12,7 @@
 class cluster {
 private:
     // the identifier
-    int id;
+    size_t id;
 
     // the points of the cluster
     point* points;
@@ -20,8 +20,11 @@ private:
     // the centroid
     point centroid;
 
-    // maximum number of points
+    // current number of points
     size_t n;
+
+    // maximum number of points
+    size_t capacity;
 
 public:
 
@@ -32,13 +35,22 @@ public:
     ~cluster();
 
     // get the id of the cluster
-    int &get_id();
+    inline size_t &get_id();
 
     // get the point
-    point &get_point(size_t &idx);
+    inline point &get_point(size_t &idx);
 
     // get the centroid
-    point &get_centroid();
+    inline point &get_centroid();
+
+    // get the current number of points
+    inline size_t &get_points_num();
+
+    // increase the current number of points
+    inline point &next_point();
+
+    // call after point is added
+    inline void point_added();
 };
 
 

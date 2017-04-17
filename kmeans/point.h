@@ -15,7 +15,7 @@ struct point {
 
 
 // get the euclidean distance of two points
-inline double x (point &a, point &b) {
+inline double point_distance (point &a, point &b) {
     return fabs(a.x - b.x);
 };
 

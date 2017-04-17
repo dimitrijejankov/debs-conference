@@ -8,8 +8,8 @@ circular_queue::circular_queue(size_t n) : capacity(n), next(0), full(false) {
     data = new point[n];
 }
 
-point &circular_queue::point(size_t &idx) {
-    return data[idx];
+point &circular_queue::get_point(size_t idx) {
+    return data[(idx + next) % capacity];
 }
 
 point &circular_queue::next_point() {
