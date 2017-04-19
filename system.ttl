@@ -7,7 +7,7 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 <http://project-hobbit.eu/resources/debs2017/ricec>    a    hobbit:SystemInstance;
-    rdfs:label    "Rice University DEBS 2017 C++"@en;
+    rdfs:label    "Rice University DEBS 2017 NEW"@en;
     rdfs:comment "Implementation from Rice University Team [C++]"@en;
     hobbit:implementsAPI <http://www.example.org/exampleBenchmark/debsAPI>;
     hobbit:imageName "git.project-hobbit.eu:4567/dj16/ricec";
