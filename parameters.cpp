@@ -14,7 +14,7 @@ std::string RABBIT_MQ_HOST_NAME() {
 #if ENVIRONMENT == LOCAL
     return "localhost";
 #elif ENVIRONMENT == HOBBIT
-    return std::getenv("HOBBIT_SYSTEM_URI");
+    return std::getenv("HOBBIT_RABBIT_HOST");
 #endif
 }
 

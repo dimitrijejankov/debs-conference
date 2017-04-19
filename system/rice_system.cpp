@@ -11,8 +11,8 @@
 
 
 rice_system::rice_system() {
-    ic = new input_component([this](int machine_idx, int dimension, int timestamp_idx, double value) {
-        this->oc.send("FUCKING NINJA");
+    ic = new input_component([](int machine_idx, int dimension, int timestamp_idx, double value) {
+        printf("Machine index %d, dimension %d, timestamp %d, value %f\n", machine_idx, dimension, timestamp_idx, value);
     });
 }
 
