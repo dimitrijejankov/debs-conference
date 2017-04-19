@@ -16,19 +16,19 @@ public:
     ~circular_queue();
 
     // get the entire data
-    inline point & get_point(size_t idx);
+    point & get_point(size_t idx);
 
     // get the entire data
-    inline point &next_point();
+    point &next_point();
 
     // is full
-    inline bool &is_full();
+    bool &is_full();
 
     // get the capacity
-    inline size_t &get_capacity();
+    size_t &get_capacity();
 
     // goes to the next point
-    inline void point_inserted();
+    void point_inserted();
 
 private:
 

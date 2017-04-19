@@ -29,28 +29,31 @@ private:
 public:
 
     // constructor
-    cluster(size_t n);
+    cluster();
 
     // destructor
     ~cluster();
 
+    // init the cluster with capacity
+    void init(size_t capacity);
+
     // get the id of the cluster
-    inline size_t &get_id();
+    size_t &get_id();
 
     // get the point
-    inline point &get_point(size_t &idx);
+    point &get_point(size_t &idx);
 
     // get the centroid
-    inline point &get_centroid();
+    point &get_centroid();
 
     // get the current number of points
-    inline size_t &get_points_num();
+    size_t &get_points_num();
 
     // increase the current number of points
-    inline point &next_point();
+    point &next_point();
 
     // call after point is added
-    inline void point_added();
+    void point_added();
 };
 
 

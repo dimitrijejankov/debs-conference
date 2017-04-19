@@ -4,12 +4,15 @@
 
 #include "cluster.h"
 
-cluster::cluster(size_t capacity) : capacity(capacity), n(0) {
-    points = new point[capacity];
-}
+cluster::cluster() : n(0) {}
 
 cluster::~cluster() {
     delete[] points;
+}
+
+void cluster::init(size_t capacity) {
+    this->points = new point[capacity];
+    this->capacity = capacity;
 }
 
 size_t &cluster::get_id() {

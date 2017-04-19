@@ -8,28 +8,36 @@
 
 using namespace std;
 
-
-kmeans::kmeans() : result_threshold(-1) {
+kmeans::kmeans(size_t cluster_max, size_t window_size, size_t maximum_iterations, double clustering_precision, size_t smaller_window, double threshold) :
+        cluster_max(cluster_max), window_size(window_size), maximum_iterations(maximum_iterations),
+        clustering_precision(clustering_precision), smaller_window(smaller_window), threshold(threshold) {
 
     // allocate the memory for the clusters
-    clusters = new cluster[NUMCLUSTERS](NUMCLUSTERS);
+    clusters = new cluster[window_size];
 
     // allocate the memory for the old clusters
-    old_clusters = new cluster[NUMCLUSTERS](NUMCLUSTERS);
+    old_clusters = new cluster[window_size];
+
+    for(int i = 0; i < num_clusters; i++) {
+        // allocate the memory for the clusters
+        clusters[i].init(window_size);
+
+        // allocate the memory for old clusters
+        old_clusters[i].init(window_size);
+    }
 
     // allocate the memory
-    row_sum = new int[NUMCLUSTERS];
+    row_sum = new int[window_size];
 
     // allocate the count
-    count = new int[NUMCLUSTERS][NUMCLUSTERS];
+    count = new int[window_size * window_size];
 
     // allocate the transition
-    transition = new double[NUMCLUSTERS][NUMCLUSTERS];
+    transition = new double[window_size * window_size];
 
     // allocate store transition
-    store_transition = new double[NUMPOINTS];
+    store_transition = new double[window_size];
 }
-
 
 bool kmeans::perform_anomaly_detection() {
     // Clear previous results:
@@ -49,8 +57,8 @@ bool kmeans::perform_anomaly_detection() {
 
 
     // Create transition matrix:
-    for (int i = 0; i < NUMCLUSTERS; i++) {
-        for (int j = 0; j < NUMCLUSTERS; j++) {
+    for (int i = 0; i < num_clusters; i++) {
+        for (int j = 0; j < num_clusters; j++) {
             if (count[i * num_clusters + j] > 0) {
                 transition[i * num_clusters + j] = ((double) count[i * num_clusters + j]) / row_sum[i];
             }
@@ -59,14 +67,14 @@ bool kmeans::perform_anomaly_detection() {
 
     // New anomaly detection code: 2.1
     double curThreshold = 1.0;
-    for (size_t i = (NUMPOINTS - SMALLERWINDOW - 1) ; i < NUMPOINTS - 1; i++) {
+    for (size_t i = (window_size - smaller_window - 1) ; i < window_size - 1; i++) {
         firstCluster = points->get_point(i).center;
         secondCluster = points->get_point(i + 1).center;
 
         curThreshold *= transition[firstCluster * num_clusters + secondCluster];
     }
 
-    if (curThreshold < THRESHOLD) {
+    if (curThreshold < threshold) {
         result_threshold = curThreshold;
         return true;	// Anomaly detected
     }
@@ -100,12 +108,12 @@ void kmeans::perform_clustering() {
         }
 
         // Take into account clustering precision:
-        if (distance < CLUSTERINGPRECISION) {
+        if (distance < clustering_precision) {
             finish = true;
         }
 
         // DEBS: Do not run more than maximum iterations:
-        if (iteration == MAXITERATIONS) {
+        if (iteration == maximum_iterations) {
             finish = true;
         }
     }
@@ -216,9 +224,6 @@ bool kmeans::perform_all_calculation(circular_queue *window) {
     // set the points:
     points = window;
 
-    // set the number of clusters
-    num_clusters = NUMCLUSTERS;
-
     // The first "NUMCLUSTERS" unique points are the cluster centers:
     set<double> unique_points;
     size_t count_unique = 0;
@@ -252,7 +257,7 @@ bool kmeans::perform_all_calculation(circular_queue *window) {
     }
 
     // if a given window has less than K distinct values than the number of clusters to be computed must be equal to the number of distinct values in the window.
-    num_clusters = count_unique < NUMCLUSTERS ? count_unique : NUMCLUSTERS;
+    num_clusters = count_unique < num_clusters ? count_unique : num_clusters;
 
     // perform the clustering:
     perform_clustering();

@@ -8,26 +8,26 @@
 #include "circular_queue.h"
 #include "cluster.h"
 
-// number of clusters. this metric should be related to the number of points
-const size_t NUMCLUSTERS = 0;
-
-// number of points:
-const size_t NUMPOINTS = 0;
-
-// maximum iterations for kmeans:
-const size_t MAXITERATIONS = 0;
-
-// terminal condition for kmeans:
-const double CLUSTERINGPRECISION = 0.0;
-
-// parameters for anomaly detection:
-const size_t SMALLERWINDOW = 0;
-
-// threshold
-const double THRESHOLD = 0.0;
-
 class kmeans {
 private:
+
+    // number of points:
+    size_t window_size;
+
+    // maximum iterations for kmeans:
+    size_t maximum_iterations;
+
+    // terminal condition for kmeans:
+    double clustering_precision;
+
+    // parameters for anomaly detection:
+    size_t smaller_window;
+
+    // maximum number of clusters
+    size_t cluster_max;
+
+    // threshold
+    double threshold;
 
     // results
     double result_threshold;
@@ -74,7 +74,8 @@ private:
 public:
 
     // constructor
-    kmeans();
+    kmeans(size_t cluster_max, size_t window_size, size_t maximum_iterations,
+           double clustering_precision, size_t smaller_window, double threshold);
 
     // destructor
     ~kmeans();
