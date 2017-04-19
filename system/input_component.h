@@ -29,7 +29,7 @@ protected:
 public:
 
     // constructor
-    input_component();
+    input_component(function<void(int, int, int, double)> callback);
 
     // destructor
     ~input_component();

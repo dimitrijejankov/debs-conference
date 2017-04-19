@@ -11,7 +11,9 @@
 
 
 rice_system::rice_system() {
-
+    ic = new input_component([this](int machine_idx, int dimension, int timestamp_idx, double value) {
+        this->oc.send("FUCKING NINJA");
+    });
 }
 
 void rice_system::run() {
@@ -21,7 +23,7 @@ void rice_system::run() {
 
     // run the input component
     std::thread input_thread ([this]() {
-        this->ic.run(this->cv, this->m);
+        this->ic->run(this->cv, this->m);
     });
 
     // detach the input thread
@@ -44,10 +46,12 @@ void rice_system::run() {
     printf("Waiting for termination message...\n");
 
     // make a conditional variable flow until we finish...
-    cv.wait(lk, [this]{return this->ic.is_finished();});
+    cv.wait(lk, [this]{return this->ic->is_finished();});
 
     printf("Sending termination message...\n");
     oc.send(TERMINATION_MESSAGE);
 }
 
-rice_system::~rice_system() {}
+rice_system::~rice_system() {
+    delete ic;
+}

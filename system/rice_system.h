@@ -22,7 +22,7 @@ class rice_system {
 private:
 
     // the input component
-    input_component ic;
+    input_component *ic;
 
     // the output component
     output_component oc;

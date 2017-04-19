@@ -7,7 +7,7 @@
 #include "parameters.h"
 #include "utils.h"
 
-input_component::input_component() {
+input_component::input_component(function<void(int, int, int, double)> callback) {
     // set the input socket to NULL
     in_channel.socket = NULL;
 
@@ -18,9 +18,7 @@ input_component::input_component() {
     init_queue(in_channel, in_queue, input_queue_name());
 
     // init the parser
-    parser = new rdf_parser([](int machine_idx, int dimension, int timestamp_idx, double value) {
-        printf("Machine index %d, dimension %d, timestamp %d, value %f\n", machine_idx, dimension, timestamp_idx, value);
-    });
+    parser = new rdf_parser(callback);
 }
 
 string input_component::input_queue_name() {
