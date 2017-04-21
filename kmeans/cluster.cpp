@@ -31,8 +31,8 @@ size_t &cluster::get_points_num() {
     return n;
 }
 
-point &cluster::next_point() {
-    return points[n + 1];
+point &cluster::current_point() {
+    return points[n];
 }
 
 void cluster::point_added() {

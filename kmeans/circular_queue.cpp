@@ -32,6 +32,16 @@ void circular_queue::point_inserted() {
     full = full || next == 0;
 }
 
+
+void circular_queue::display() {
+    for (int i = 0; i < capacity; i++) {
+        std::cout << data[(i + next) % capacity].x << "\t";
+    }
+    std::cout << std::endl;
+}
+
+
+
 circular_queue::~circular_queue() {
     delete[] data;
 }

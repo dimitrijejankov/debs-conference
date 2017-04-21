@@ -28,7 +28,7 @@ include_directories(parser system .)
 set(CMAKE_REQUIRED_INCLUDES ${RABBITMQ_HEADERS})
 
 # grab the source files
-file(GLOB PROJECT_SOURCE "system/*.cpp" "parser/*.cpp" "kmeans/*.cpp" "*.cpp")
+file(GLOB PROJECT_SOURCE "system/*.cpp" "parser/*.cpp" "kmeans/*.cpp")
 
 # grab the headers files
 file(GLOB PROJECT_HEADERS "system/*.h" "parser/*.h" "kmeans/*.h" "*.h")
@@ -40,7 +40,16 @@ set(SOURCE_FILES ${PROJECT_SOURCE} ${PROJECT_HEADERS})
 add_executable(HobbitRewrite ${SOURCE_FILES})
 
 # link rabbitmq
-target_link_libraries(HobbitRewrite ${RABBITMQ_LIBRARIES})
+target_link_libraries(HobbitRewrite ${RABBITMQ_LIBRARIES} parameters.cpp utils.cpp)
 
 # link pthreads
 target_link_libraries (HobbitRewrite ${CMAKE_THREAD_LIBS_INIT})
+
+# set the executable
+add_executable(KmeansTest ${SOURCE_FILES} test/kmeans_main.cpp parameters.cpp utils.cpp)
+
+# link rabbitmq
+target_link_libraries(KmeansTest ${RABBITMQ_LIBRARIES})
+
+# link pthreads
+target_link_libraries (KmeansTest ${CMAKE_THREAD_LIBS_INIT})

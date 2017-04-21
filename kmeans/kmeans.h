@@ -23,9 +23,6 @@ private:
     // parameters for anomaly detection:
     size_t smaller_window;
 
-    // maximum number of clusters
-    size_t cluster_max;
-
     // threshold
     double threshold;
 
@@ -72,10 +69,11 @@ private:
     void calculate_centroids();
 
 public:
+    double get_result_threshold() const;
 
     // constructor
-    kmeans(size_t cluster_max, size_t window_size, size_t maximum_iterations,
-           double clustering_precision, size_t smaller_window, double threshold);
+    kmeans(size_t window_size, size_t maximum_iterations,
+           double clustering_precision, size_t smaller_window, double threshold, size_t num_clusters);
 
     // destructor
     ~kmeans();

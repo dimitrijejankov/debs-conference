@@ -8,9 +8,9 @@
 
 using namespace std;
 
-kmeans::kmeans(size_t cluster_max, size_t window_size, size_t maximum_iterations, double clustering_precision, size_t smaller_window, double threshold) :
-        cluster_max(cluster_max), window_size(window_size), maximum_iterations(maximum_iterations),
-        clustering_precision(clustering_precision), smaller_window(smaller_window), threshold(threshold) {
+kmeans::kmeans(size_t window_size, size_t maximum_iterations, double clustering_precision, size_t smaller_window, double threshold, size_t num_clusters) :
+        window_size(window_size), maximum_iterations(maximum_iterations),
+        clustering_precision(clustering_precision), smaller_window(smaller_window), threshold(threshold), num_clusters(num_clusters) {
 
     // allocate the memory for the clusters
     clusters = new cluster[window_size];
@@ -18,7 +18,7 @@ kmeans::kmeans(size_t cluster_max, size_t window_size, size_t maximum_iterations
     // allocate the memory for the old clusters
     old_clusters = new cluster[window_size];
 
-    for(int i = 0; i < num_clusters; i++) {
+    for(int i = 0; i < window_size; i++) {
         // allocate the memory for the clusters
         clusters[i].init(window_size);
 
@@ -43,6 +43,12 @@ bool kmeans::perform_anomaly_detection() {
     // Clear previous results:
     result_threshold = -1;
 
+
+    // for each cluster init row sum
+    for (int i = 0; i < num_clusters; ++i) {
+        row_sum[i] = 0;
+    }
+
     // Count pairwise occurrences:
     int firstCluster, secondCluster;
     for (size_t i = 0; i < points->get_capacity() - 1; i++) {
@@ -59,6 +65,10 @@ bool kmeans::perform_anomaly_detection() {
     // Create transition matrix:
     for (int i = 0; i < num_clusters; i++) {
         for (int j = 0; j < num_clusters; j++) {
+
+            // init to zero
+            transition[i * num_clusters + j] = 0;
+
             if (count[i * num_clusters + j] > 0) {
                 transition[i * num_clusters + j] = ((double) count[i * num_clusters + j]) / row_sum[i];
             }
@@ -172,7 +182,7 @@ void kmeans::assign_cluster() {
         pt.center = cluster_idx;
 
         // add the point
-        clusters[cluster_idx].next_point() = pt;
+        clusters[cluster_idx].current_point() = pt;
 
         // notify that the point was added
         clusters[cluster_idx].point_added();
@@ -246,10 +256,10 @@ bool kmeans::perform_all_calculation(circular_queue *window) {
             clusters[count_unique].get_id() = count_unique;
 
             // set the value of the centroid
-            clusters->get_centroid().x = curr_value;
+            clusters[count_unique].get_centroid().x = curr_value;
 
             // reset the number of points
-            clusters->get_points_num() = 0;
+            clusters[count_unique].get_points_num() = 0;
 
             //Increment unique points count:
             count_unique++;
@@ -285,4 +295,8 @@ kmeans::~kmeans() {
 
     // free store transition
     delete[] store_transition;
+}
+
+double kmeans::get_result_threshold() const {
+    return result_threshold;
 }

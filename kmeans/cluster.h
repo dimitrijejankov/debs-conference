@@ -50,7 +50,7 @@ public:
     size_t &get_points_num();
 
     // increase the current number of points
-    point &next_point();
+    point &current_point();
 
     // call after point is added
     void point_added();

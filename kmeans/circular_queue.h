@@ -6,6 +6,7 @@
 #define HOBBITREWRITE_CIRCULAR_QUEUE_H
 
 #include <cstdio>
+#include <iostream>
 #include "point.h"
 
 class circular_queue {
@@ -29,6 +30,10 @@ public:
 
     // goes to the next point
     void point_inserted();
+
+    // display the queue
+    void display();
+
 
 private:
 

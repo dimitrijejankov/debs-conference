@@ -3,7 +3,7 @@
 
 #include <string>
 
-#define ENVIRONMENT HOBBIT
+#define ENVIRONMENT LOCAL
 #define LOCAL  1
 #define HOBBIT 2
 
