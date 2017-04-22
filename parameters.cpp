@@ -53,12 +53,12 @@ std::string HOBBIT_EXPERIMENT_URI() {
 #endif
 }
 
-// get the input queue name
+// get the input amqp_queue name
 std::string DATA_GEN_2_SYSTEM_QUEUE_NAME() {
     return "hobbit.datagen-system";
 }
 
-// get the output queue name
+// get the output amqp_queue name
 std::string SYSTEM_2_EVAL_STORAGE_QUEUE_NAME() {
     return "hobbit.system-evalstore";
 }

@@ -27,10 +27,10 @@ std::string SYSTEM_PARAMETERS_MODEL();
 // get the experiment uri
 std::string HOBBIT_EXPERIMENT_URI();
 
-// get the input queue name
+// get the input amqp_queue name
 std::string DATA_GEN_2_SYSTEM_QUEUE_NAME();
 
-// get the output queue name
+// get the output amqp_queue name
 std::string SYSTEM_2_EVAL_STORAGE_QUEUE_NAME();
 
 // get hobbit command exchange name

@@ -17,11 +17,21 @@ output_component::output_component() {
     // init the input channel
     init_channel(out_channel);
 
-    // init the input queue
+    // init the input amqp_queue
     init_queue(out_channel, out_queue, output_queue_name());
+
+    // make the comparator for the anomalies
+    auto cmp = [](anomaly& left, anomaly& right) { return left.index < right.index;};
+
+    // init the priority amqp_queue
+    buffer = new priority_queue<anomaly, vector<anomaly>, std::function<bool(anomaly&, anomaly&)>>(cmp);
 }
 
 output_component::~output_component() {
+
+    // free the buffer
+    delete buffer;
+
     // close the channel
     die_on_amqp_error(amqp_channel_close(out_channel.conn, 1, AMQP_REPLY_SUCCESS), "Closing channel");
 
@@ -72,4 +82,38 @@ void output_component::send(const char *bytes, size_t length) {
 
 void output_component::send(const string value) {
     send(value.c_str(), value.size());
+}
+
+void output_component::output_anomaly(size_t idx, size_t machine_no, size_t dimension_no, double final_threshold, size_t timestamp) {
+
+    // grab a lock for the buffer
+    unique_lock<mutex> u(m_b);
+
+    // just so we don't have to grab new memory each time
+    static anomaly tmp;
+
+    tmp.machine_no = machine_no;
+    tmp.dimension_no = dimension_no;
+    tmp.final_threshold = final_threshold;
+    tmp.timestamp = timestamp;
+
+    // push the anomaly into the buffer.
+    buffer->push(tmp);
+
+    // tell the output to send the anomalies
+    c_b.notify_one();
+}
+
+void output_component::run() {
+
+    unique_lock<mutex> lk(m_b);
+
+    for(;;) {
+
+        // wait until we have something in the buffer
+        c_b.wait(lk, []{return !buffer->empty();});
+
+        // send the output
+        send("Ninja");
+    }
 }

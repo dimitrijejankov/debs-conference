@@ -31,13 +31,13 @@ public:
     // goes to the next point
     void point_inserted();
 
-    // display the queue
+    // display the amqp_queue
     void display();
 
 
 private:
 
-    // queue data
+    // amqp_queue data
     point* data;
 
     // next position

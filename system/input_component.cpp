@@ -14,7 +14,7 @@ input_component::input_component(function<void(int, int, int, double)> callback)
     // init the input channel
     init_channel(in_channel);
 
-    // init the input queue
+    // init the input amqp_queue
     init_queue(in_channel, in_queue, input_queue_name());
 
     // init the parser
@@ -40,14 +40,14 @@ input_component::~input_component() {
 }
 
 void input_component::run(condition_variable &cv, mutex &m) {
-    // grab the input queue name
+    // grab the input amqp_queue name
     string in_name = input_queue_name();
 
     // start the consuming
     amqp_basic_consume(in_channel.conn, 1, amqp_cstring_bytes(in_name.c_str()), amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
     die_on_amqp_error(amqp_get_rpc_reply(in_channel.conn), "Consuming");
 
-    // start fetching from the input queue
+    // start fetching from the input amqp_queue
     for (;;) {
         amqp_rpc_reply_t res;
         amqp_envelope_t envelope;

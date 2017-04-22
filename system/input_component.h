@@ -11,14 +11,14 @@
 
 class input_component : public component {
 protected:
-    // returns the input queue name
+    // returns the input amqp_queue name
     string input_queue_name();
 
     // the input channel
-    channel in_channel;
+    amqp_channel in_channel;
 
-    // the input queue
-    queue in_queue;
+    // the input amqp_queue
+    amqp_queue in_queue;
 
     // the rdf parser
     rdf_parser *parser;

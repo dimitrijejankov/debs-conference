@@ -15,7 +15,7 @@ component::component() {
     port = RABBIT_MQ_PORT();
 }
 
-void component::init_channel(channel &c) {
+void component::init_channel(amqp_channel &c) {
     // create a connection object
     c.conn  = amqp_new_connection();
 
@@ -46,26 +46,26 @@ void component::init_channel(channel &c) {
 }
 
 
-void component::init_queue(channel &c, queue &q, string queue_name) {
-    // declare queue
+void component::init_queue(amqp_channel &c, amqp_queue &q, string queue_name) {
+    // declare amqp_queue
     amqp_queue_declare_ok_t *r = amqp_queue_declare(c.conn, 1, amqp_cstring_bytes(queue_name.c_str()), 0, 0, 0, 1, amqp_empty_table);
 
-    // if we failed to create a queue exit
+    // if we failed to create a amqp_queue exit
     die_on_amqp_error(amqp_get_rpc_reply(c.conn), "Declaring queue");
 }
 
-string component::init_queue(channel &c, queue &q) {
-    // declare queue
+string component::init_queue(amqp_channel &c, amqp_queue &q) {
+    // declare amqp_queue
     amqp_queue_declare_ok_t *r = amqp_queue_declare(c.conn, 1, amqp_empty_bytes, 0, 0, 0, 1, amqp_empty_table);
 
-    // if we failed to create a queue exit
+    // if we failed to create a amqp_queue exit
     die_on_amqp_error(amqp_get_rpc_reply(c.conn), "Declaring anonymous queue");
 
-    // return the queue name
+    // return the amqp_queue name
     return string((char*) amqp_bytes_malloc_dup(r->queue).bytes, r->queue.len);
 }
 
-void component::bind_exchange(channel &c, queue &q, string &queue, string &exchange) {
+void component::bind_exchange(amqp_channel &c, amqp_queue &q, string &queue, string &exchange) {
 
     // declare the exchange
     amqp_exchange_declare(c.conn, 1, amqp_cstring_bytes(exchange.c_str()), amqp_cstring_bytes("fanout"),

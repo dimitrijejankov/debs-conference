@@ -11,7 +11,7 @@ command_component::command_component() {
     // initialize the response channel
     init_channel(response_channel);
 
-    // initialize the response queue
+    // initialize the response amqp_queue
     response_queue_name = init_queue(response_channel, response_queue);
 
     // grab the exchange name

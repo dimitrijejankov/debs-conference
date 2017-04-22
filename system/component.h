@@ -10,13 +10,13 @@
 
 using namespace std;
 
-struct channel {
+struct amqp_channel {
     amqp_socket_t *socket;
     amqp_connection_state_t conn;
     int status;
 };
 
-class queue {
+class amqp_queue {
     string name;
     string exchange;
 };
@@ -34,15 +34,15 @@ protected:
     int port;
 
     // initialize the channel
-    void init_channel(channel &c);
+    void init_channel(amqp_channel &c);
 
-    // initialize the queue
-    void init_queue(channel &c, queue &q, string queue_name);
+    // initialize the amqp_queue
+    void init_queue(amqp_channel &c, amqp_queue &q, string queue_name);
 
-    // initialize anonymous queue
-    string init_queue(channel &c, queue &q);
+    // initialize anonymous amqp_queue
+    string init_queue(amqp_channel &c, amqp_queue &q);
 
-    void bind_exchange(channel &c, queue &q, string &queue, string &exchange);
+    void bind_exchange(amqp_channel &c, amqp_queue &q, string &queue, string &exchange);
 };
 
 

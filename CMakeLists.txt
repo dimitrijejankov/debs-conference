@@ -37,10 +37,10 @@ file(GLOB PROJECT_HEADERS "system/*.h" "parser/*.h" "kmeans/*.h" "*.h")
 set(SOURCE_FILES ${PROJECT_SOURCE} ${PROJECT_HEADERS})
 
 # set the executable
-add_executable(HobbitRewrite ${SOURCE_FILES})
+add_executable(HobbitRewrite ${SOURCE_FILES} main.cpp parameters.cpp utils.cpp)
 
 # link rabbitmq
-target_link_libraries(HobbitRewrite ${RABBITMQ_LIBRARIES} parameters.cpp utils.cpp)
+target_link_libraries(HobbitRewrite ${RABBITMQ_LIBRARIES})
 
 # link pthreads
 target_link_libraries (HobbitRewrite ${CMAKE_THREAD_LIBS_INIT})

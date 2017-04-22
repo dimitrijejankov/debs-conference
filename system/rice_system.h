@@ -16,8 +16,6 @@
 #include "command_component.h"
 #include "output_component.h"
 
-using namespace std;
-
 class rice_system {
 private:
 
@@ -31,10 +29,10 @@ private:
     command_component cr;
 
     // mutex to sync the system
-    mutex m;
+    std::mutex m;
 
     // conditional variable to sync the system
-    condition_variable cv;
+    std::condition_variable cv;
 
 public:
 

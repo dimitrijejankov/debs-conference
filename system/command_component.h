@@ -30,15 +30,15 @@ const char START_BENCHMARK_SIGNAL = 17;
 class command_component : public component {
 protected:
     // the response channel
-    channel response_channel;
+    amqp_channel response_channel;
 
-    // the response queue
-    queue response_queue;
+    // the response amqp_queue
+    amqp_queue response_queue;
 
     // session id
     string session_id;
 
-    // queue name
+    // amqp_queue name
     string response_queue_name;
 
     // exchange name
@@ -64,13 +64,13 @@ public:
     // handle command
     void handle_command(char* bytes, size_t length, amqp_basic_properties_t props);
 
-    // send bytes to the command queue
+    // send bytes to the command amqp_queue
     void send_to_cmd_queue(char command);
 
-    // send command and bytes to the command queue
+    // send command and bytes to the command amqp_queue
     void send_to_cmd_queue(char command, char *data, size_t length);
 
-    // send the command and bytes to the command queue with properties
+    // send the command and bytes to the command amqp_queue with properties
     void send_to_cmd_queue(char command, char *data, size_t length, amqp_basic_properties_t_ const *props);
 
     // swap endian
