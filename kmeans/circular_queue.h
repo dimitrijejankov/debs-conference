@@ -12,7 +12,11 @@
 class circular_queue {
 public:
 
+    // constructor
     circular_queue(size_t n);
+
+    // copy constructor
+    circular_queue(circular_queue &old);
 
     ~circular_queue();
 
@@ -31,7 +35,7 @@ public:
     // goes to the next point
     void point_inserted();
 
-    // display the amqp_queue
+    // display the queue
     void display();
 
 

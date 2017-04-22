@@ -90,6 +90,7 @@ void output_component::output_anomaly(size_t idx, size_t machine_no, size_t dime
     unique_lock<mutex> u(m_b);
 
     // just so we don't have to grab new memory each time
+
     static anomaly tmp;
 
     tmp.machine_no = machine_no;
@@ -111,7 +112,7 @@ void output_component::run() {
     for(;;) {
 
         // wait until we have something in the buffer
-        c_b.wait(lk, []{return !buffer->empty();});
+        c_b.wait(lk, [this]{return !this->buffer->empty();});
 
         // send the output
         send("Ninja");

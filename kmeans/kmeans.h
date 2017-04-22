@@ -73,13 +73,13 @@ public:
 
     // constructor
     kmeans(size_t window_size, size_t maximum_iterations,
-           double clustering_precision, size_t smaller_window, double threshold, size_t num_clusters);
+           double clustering_precision, size_t smaller_window, double threshold);
 
     // destructor
     ~kmeans();
 
     // do the clustering on the window
-    bool perform_all_calculation(circular_queue *window);
+    bool perform_all_calculation(circular_queue *window, size_t num_clusters);
 };
 
 

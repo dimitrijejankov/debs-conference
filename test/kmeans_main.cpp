@@ -7,29 +7,6 @@
 
 int main() {
 
-
-
-    /*
-    // Testing CircularQueue: Everything looks fine:
-    int localCapacity = 10;
-    circular_queue * cq = new circular_queue(localCapacity);
-
-    //Insert some points:
-    for (int i = 0; i < localCapacity; i++) {
-        cq->next_point().x = i;
-        cq->point_inserted();
-    }
-    cq->display();
-
-    // Insert some more:
-    for (int i = 0; i < localCapacity; i++) {
-        cq->next_point().x = 2 * i;
-        cq->point_inserted();
-        cq->display();
-    }
-    */
-
-
     // Parameters for KMeans:
     std::cout << "KMeans Testing!\n";
 
@@ -66,8 +43,8 @@ int main() {
         if (cq->is_full()) {
             //cq->display();
             // Create kmeans object:
-            kmeans * k = new kmeans(windowSize, maximumIterations, clusteringPrecision, smallerWindowSize, thresholdProbability, numClusters);
-            bool hasAnomalies = k->perform_all_calculation(cq);
+            kmeans * k = new kmeans(windowSize, maximumIterations, clusteringPrecision, smallerWindowSize, thresholdProbability);
+            bool hasAnomalies = k->perform_all_calculation(cq, numClusters);
 
             i++;
 

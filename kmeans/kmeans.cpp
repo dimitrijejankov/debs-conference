@@ -8,7 +8,7 @@
 
 using namespace std;
 
-kmeans::kmeans(size_t window_size, size_t maximum_iterations, double clustering_precision, size_t smaller_window, double threshold, size_t num_clusters) :
+kmeans::kmeans(size_t window_size, size_t maximum_iterations, double clustering_precision, size_t smaller_window, double threshold) :
         window_size(window_size), maximum_iterations(maximum_iterations),
         clustering_precision(clustering_precision), smaller_window(smaller_window), threshold(threshold), num_clusters(num_clusters) {
 
@@ -230,9 +230,12 @@ void kmeans::calculate_centroids() {
     }
 }
 
-bool kmeans::perform_all_calculation(circular_queue *window) {
+bool kmeans::perform_all_calculation(circular_queue *window, size_t num_clusters) {
     // set the points:
-    points = window;
+    this->points = window;
+
+    // set the number of clusters
+    this->num_clusters = num_clusters;
 
     // The first "NUMCLUSTERS" unique points are the cluster centers:
     set<double> unique_points;

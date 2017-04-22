@@ -3,6 +3,7 @@
 //
 
 #include "circular_queue.h"
+#include "memory.h"
 
 circular_queue::circular_queue(size_t n) : capacity(n), next(0), full(false) {
     data = new point[n];
@@ -44,4 +45,13 @@ void circular_queue::display() {
 
 circular_queue::~circular_queue() {
     delete[] data;
+}
+
+circular_queue::circular_queue(circular_queue &old)  : capacity(old.capacity), next(old.capacity), full(old.full) {
+
+    // make new new points
+    data = new point[capacity];
+
+    // copy the memory
+    memcpy(data, old.data, capacity * sizeof(point));
 }

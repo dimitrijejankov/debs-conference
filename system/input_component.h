@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include "component.h"
 #include "rdf_parser.h"
+#include "data/window_manager.h"
 
 class input_component : public component {
 protected:
@@ -23,13 +24,16 @@ protected:
     // the rdf parser
     rdf_parser *parser;
 
+    // window manager
+    window_manager wm;
+
     // finished
     bool finished;
 
 public:
 
     // constructor
-    input_component(function<void(int, int, int, double)> callback);
+    input_component(size_t window_size, vector<worker_component*> workers);
 
     // destructor
     ~input_component();

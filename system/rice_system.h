@@ -15,6 +15,7 @@
 #include "input_component.h"
 #include "command_component.h"
 #include "output_component.h"
+#include "worker_component.h"
 
 class rice_system {
 private:
@@ -33,6 +34,9 @@ private:
 
     // conditional variable to sync the system
     std::condition_variable cv;
+
+    // workers
+    vector<worker_component*> workers;
 
 public:
 

@@ -10,7 +10,7 @@
 // constants
 
 
-rdf_parser::rdf_parser(function<void(int, int, int, double)> callback) : callback(callback) {
+rdf_parser::rdf_parser(function<void(size_t, size_t, size_t, double)> callback) : callback(callback) {
 
     // we use this to skip every line
     lineStartSkip = strlen(LINE_START);

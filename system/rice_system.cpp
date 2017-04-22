@@ -6,16 +6,16 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <parameters.h>
 #include "rice_system.h"
-#include "parameters.h"
-
 
 rice_system::rice_system() {
 
-    ic = new input_component([](int machine_idx, int dimension, int timestamp_idx, double value) {
+    // add the workers
+    workers.push_back(new worker_component(&oc));
 
-        //printf("Machine index %d, dimension %d, timestamp %d, value %f\n", machine_idx, dimension, timestamp_idx, value);
-    });
+    //TODO fix the windows sizes
+    ic = new input_component(10, workers);
 }
 
 void rice_system::run() {
@@ -47,6 +47,23 @@ void rice_system::run() {
     // detach the command
     output_thread.detach();
 
+    worker_component *tmp = *workers.begin();
+
+    // run each worker
+    for(auto w = workers.begin(); w != workers.end(); w++) {
+
+        // get the pointer for the worker
+        tmp = *w;
+
+        // run the worker
+        std::thread t ([tmp]() {
+            tmp->run();
+        });
+
+        // detach the thread
+        t.detach();
+    }
+
     // log the action
     printf("Sending SYSTEM_READY_SIGNAL...\n");
 
@@ -63,5 +80,10 @@ void rice_system::run() {
 }
 
 rice_system::~rice_system() {
+
+    for(auto it = workers.begin(); it != workers.end(); it++) {
+        delete *it;
+    }
+
     delete ic;
 }

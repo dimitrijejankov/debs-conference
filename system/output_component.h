@@ -10,27 +10,18 @@
 #include <queue>
 #include <condition_variable>
 #include "component.h"
-
-struct anomaly {
-
-    size_t index;
-
-    size_t machine_no;
-    size_t dimension_no;
-    double final_threshold;
-    size_t timestamp;
-};
+#include "data/anormaly.h"
 
 class output_component : public component {
 private:
 
-    // returns the output amqp_queue name
+    // returns the output queue name
     string output_queue_name();
 
     // the response channel
     amqp_channel out_channel;
 
-    // the response amqp_queue
+    // the response queue
     amqp_queue out_queue;
 
     // mutex to sync the output

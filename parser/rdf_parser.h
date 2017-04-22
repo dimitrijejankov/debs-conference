@@ -51,12 +51,12 @@ private:
     size_t valueSkip2;
 
     // callback for parsing (machine_idx, dimension, timestamp_idx, value)
-    function<void(int, int, int, double)> callback;
+    function<void(size_t, size_t, size_t, double)> callback;
 
 public:
 
     // constructor for the rdf_parser
-    rdf_parser(function<void(int, int, int, double)> callback);
+    rdf_parser(function<void(size_t, size_t, size_t, double)> callback);
 
     // parse
     void parse(char* data, size_t length);
