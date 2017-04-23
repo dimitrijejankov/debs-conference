@@ -49,6 +49,13 @@ bool kmeans::perform_anomaly_detection() {
         row_sum[i] = 0;
     }
 
+    // initialize the counts
+    for(int i = 0; i < num_clusters; i++) {
+        for(int j = 0; j < num_clusters; j++) {
+            count[i * num_clusters + j] = 0;
+        }
+    }
+
     // Count pairwise occurrences:
     int firstCluster, secondCluster;
     for (size_t i = 0; i < points->get_capacity() - 1; i++) {
@@ -270,7 +277,7 @@ bool kmeans::perform_all_calculation(circular_queue *window, size_t num_clusters
     }
 
     // if a given window has less than K distinct values than the number of clusters to be computed must be equal to the number of distinct values in the window.
-    num_clusters = count_unique < num_clusters ? count_unique : num_clusters;
+    this->num_clusters = count_unique < num_clusters ? count_unique : num_clusters;
 
     // perform the clustering:
     perform_clustering();

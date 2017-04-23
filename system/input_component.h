@@ -33,7 +33,7 @@ protected:
 public:
 
     // constructor
-    input_component(size_t window_size, vector<worker_component*> workers);
+    input_component(metadata_parser *mp, vector<worker_component*> workers);
 
     // destructor
     ~input_component();

@@ -37,7 +37,7 @@ file(GLOB PROJECT_HEADERS "system/*.h" "parser/*.h" "kmeans/*.h" "*.h" "data/*.h
 set(SOURCE_FILES ${PROJECT_SOURCE} ${PROJECT_HEADERS})
 
 # set the executable
-add_executable(HobbitRewrite ${SOURCE_FILES} main.cpp parameters.cpp utils.cpp)
+add_executable(HobbitRewrite ${SOURCE_FILES} main.cpp parameters.cpp utils.cpp parser/metadata_parser.cpp parser/metadata_parser.h)
 
 # link rabbitmq
 target_link_libraries(HobbitRewrite ${RABBITMQ_LIBRARIES})

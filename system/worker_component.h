@@ -12,6 +12,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <kmeans/kmeans.h>
+#include <metadata_parser.h>
 #include "output_component.h"
 
 using namespace std;
@@ -39,23 +40,8 @@ private:
     // kmeans
     kmeans detector;
 
-    // number of clusters
-    size_t num_clusters = 5;
-
-    // Other Fixed Parameters:
-    size_t window_size = 10;
-
-    // maximum number of iterations
-    size_t maximum_iterations = 50;
-
-    // cluster precision
-    double clustering_precision = 0.00001;
-
-    // smaller window size
-    size_t smaller_window_size = 5;
-
-    // threshold probability
-    double threshold_probability = 0.005;
+    // metadata parser
+    metadata_parser *mp;
 
     // output component
     output_component *oc;
@@ -63,7 +49,7 @@ private:
 public:
 
     // constructor
-    worker_component(output_component *oc);
+    worker_component(output_component *oc, metadata_parser *mp);
 
     // add the window to the task
     void queue_task(size_t idx, size_t machine_no, size_t dimension_no, size_t timestamp, circular_queue *w);

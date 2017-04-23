@@ -5,12 +5,13 @@
 #include <cstring>
 #include <cmath>
 #include "rdf_parser.h"
+#include "metadata_parser.h"
 
 
 // constants
 
 
-rdf_parser::rdf_parser(function<void(size_t, size_t, size_t, double)> callback) : callback(callback) {
+rdf_parser::rdf_parser(metadata_parser *mp, function<void(size_t, size_t, size_t, double)> callback) : callback(callback), mp(mp) {
 
     // we use this to skip every line
     lineStartSkip = strlen(LINE_START);
@@ -152,8 +153,9 @@ size_t rdf_parser::parse_line(char *line) {
             value = fast_atof(line + i, j - i);
 
             // call the callback
-            //printf("Machine index %d, dimension %d, timestamp %d, value %f\n", machine_idx, dimension, timestamp_idx, value);
-            callback(machine_idx, dimension, timestamp_idx, value);
+            if(mp->get_cluster_no((size_t)machine_idx)[dimension] != 0){
+                callback((size_t)machine_idx, (size_t)dimension, (size_t)timestamp_idx, value);
+            }
         }
     }
 

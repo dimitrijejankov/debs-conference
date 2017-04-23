@@ -11,11 +11,17 @@
 
 rice_system::rice_system() {
 
+    // output component
+    oc = new output_component();
+
     // add the workers
-    workers.push_back(new worker_component(&oc));
+    workers.push_back(new worker_component(oc, &mp));
 
     //TODO fix the windows sizes
-    ic = new input_component(10, workers);
+    ic = new input_component(&mp, workers);
+
+    // command component
+    cr = new command_component();
 }
 
 void rice_system::run() {
@@ -33,7 +39,7 @@ void rice_system::run() {
 
     // run the command component
     std::thread command_thread ([this]() {
-        this->cr.run();
+        this->cr->run();
     });
 
     // detach the command
@@ -41,13 +47,13 @@ void rice_system::run() {
 
     // run the output component
     std::thread output_thread ([this]() {
-        this->oc.run();
+        this->oc->run();
     });
 
     // detach the command
     output_thread.detach();
 
-    worker_component *tmp = *workers.begin();
+    /*worker_component *tmp = *workers.begin();
 
     // run each worker
     for(auto w = workers.begin(); w != workers.end(); w++) {
@@ -63,12 +69,13 @@ void rice_system::run() {
         // detach the thread
         t.detach();
     }
+    */
 
     // log the action
     printf("Sending SYSTEM_READY_SIGNAL...\n");
 
     // send the system ready signal
-    cr.send_to_cmd_queue(SYSTEM_READY_SIGNAL);
+    cr->send_to_cmd_queue(SYSTEM_READY_SIGNAL);
 
     printf("Waiting for termination message...\n");
 
@@ -76,14 +83,22 @@ void rice_system::run() {
     cv.wait(lk, [this]{return this->ic->is_finished();});
 
     printf("Sending termination message...\n");
-    oc.send(TERMINATION_MESSAGE);
+    oc->send(TERMINATION_MESSAGE);
 }
 
 rice_system::~rice_system() {
 
+    // free the workers
     for(auto it = workers.begin(); it != workers.end(); it++) {
         delete *it;
     }
 
+    // free the input component
     delete ic;
+
+    // free the output component
+    delete oc;
+
+    // free the command component
+    delete cr;
 }

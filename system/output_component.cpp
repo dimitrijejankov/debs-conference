@@ -114,6 +114,11 @@ void output_component::run() {
         // wait until we have something in the buffer
         c_b.wait(lk, [this]{return !this->buffer->empty();});
 
+        // pop the anomaly
+        buffer->pop();
+
+        size_t xx = buffer->size();
+
         // send the output
         send("Ninja");
     }

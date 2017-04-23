@@ -5,7 +5,7 @@
 #ifndef HOBBITREWRITE_WINDOW_MANAGER_H
 #define HOBBITREWRITE_WINDOW_MANAGER_H
 
-#define DIMENSIONS_PER_MACHINE 2000
+#define DIMENSIONS_PER_MACHINE 1000
 
 #include <unordered_map>
 #include <vector>

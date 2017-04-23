@@ -9,6 +9,7 @@
 #include <amqp.h>
 #include <amqp_tcp_socket.h>
 #include <sys/socket.h>
+#include <metadata_parser.h>
 #include "rdf_parser.h"
 #include "utils.h"
 #include "component.h"
@@ -24,10 +25,13 @@ private:
     input_component *ic;
 
     // the output component
-    output_component oc;
+    output_component *oc;
 
     // the command component
-    command_component cr;
+    command_component *cr;
+
+    // metadata parser
+    metadata_parser mp;
 
     // mutex to sync the system
     std::mutex m;

@@ -171,5 +171,5 @@ command_component::~command_component() {
 }
 
 void command_component::swap_endian(int32_t &value) {
-    value = ( value >> 24 ) | (( value << 8) & 0x00ff0000 )| ((value >> 8) & 0x0000ff00) | ( value << 24)  ;
+    value = ( value >> 24 ) | (( value << 8) & 0x00ff0000 )| ((value >> 8) & 0x0000ff00) | ( value << 24);
 }

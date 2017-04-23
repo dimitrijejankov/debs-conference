@@ -6,8 +6,19 @@
 
 void worker_component::queue_task(size_t idx, size_t machine_no, size_t dimension_no, size_t timestamp, circular_queue *w) {
 
+    static int counter = 0;
+
+    bool detected = detector.perform_all_calculation(w, mp->get_cluster_no(machine_no)[dimension_no]);
+
+    // if we have detected an anomaly
+    if(detected) {
+        //oc->output_anomaly(idx, machine_no, dimension_no, detector.get_result_threshold(), timestamp);
+        printf("anomaly : %d, thrashould %lf, machine number %d, timestamp %d \n", counter++, detector.get_result_threshold(), (int)machine_no, (int)dimension_no);
+    }
+}
+    /*
     // lock the mutex
-    unique_lock<mutex> lq;
+    //unique_lock<mutex> lq;
 
     static task tmp;
 
@@ -29,19 +40,23 @@ void worker_component::queue_task(size_t idx, size_t machine_no, size_t dimensio
     // push the task
     tasks.push_back(tmp);
 
+    //size_t xx = tasks.size();
+
     // notify the worker that it a new task
-    c.notify_one();
+    //c.notify_one();
+    run();
 }
+     */
 
 void worker_component::run() {
 
     // lock the mutex
-    unique_lock<mutex> lq(m);
+    //unique_lock<mutex> lq(m);
 
-    for(;;) {
+    //for(;;) {
 
         // wait until we have something in the task queu
-        c.wait(lq, [this]{return !this->tasks.empty();});
+        //c.wait(lq, [this]{return !this->tasks.empty();});
 
         // grab the first task
         task tmp = tasks.front();
@@ -50,10 +65,10 @@ void worker_component::run() {
         tasks.pop_front();
 
         // we grabbed the task
-        lq.unlock();
+        //lq.unlock();
 
         // preform calculations
-        bool detected = detector.perform_all_calculation(tmp.w, num_clusters);
+        bool detected = detector.perform_all_calculation(tmp.w, mp->get_cluster_no(tmp.machine_no)[tmp.dimension_no]);
 
         // if we have detected an anomaly
         if(detected) {
@@ -64,8 +79,12 @@ void worker_component::run() {
         delete tmp.w;
 
         // lock the thing again
-        lq.lock();
-    }
+        //lq.lock();
+    //}
 }
 
-worker_component::worker_component(output_component *oc) : oc(oc), detector(10, 50, 0.00001, 5, 0.005) {}
+worker_component::worker_component(output_component *oc, metadata_parser *mp) : oc(oc), mp(mp), detector(mp->get_window_size(),
+                                                                                                         mp->get_max_clustering_iterations(),
+                                                                                                         mp->get_clustering_precision(),
+                                                                                                         mp->get_transitions_amount(),
+                                                                                                         mp->get_threshold()) {}

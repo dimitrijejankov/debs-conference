@@ -7,7 +7,7 @@
 #include "parameters.h"
 #include "utils.h"
 
-input_component::input_component(size_t window_size, vector<worker_component*> workers) : wm(window_size, workers) {
+input_component::input_component(metadata_parser *mp, vector<worker_component*> workers) : wm(mp->get_window_size(), workers) {
     // set the input socket to NULL
     in_channel.socket = NULL;
 
@@ -18,7 +18,7 @@ input_component::input_component(size_t window_size, vector<worker_component*> w
     init_queue(in_channel, in_queue, input_queue_name());
 
     // init the parser
-    parser = new rdf_parser([this](size_t machine_idx, size_t dimension, size_t timestamp_idx, double value) {
+    parser = new rdf_parser(mp, [this](size_t machine_idx, size_t dimension, size_t timestamp_idx, double value) {
         this->wm.push_data(machine_idx, dimension, timestamp_idx, value);
     });
 }
