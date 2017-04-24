@@ -39,7 +39,7 @@ public:
     void display();
 
 
-private:
+//private:
 
     // amqp_queue data
     point* data;

@@ -75,6 +75,10 @@ public:
     inline int fast_atoi(const char *str, size_t len);
 
     inline double fast_atof(char *str, size_t len);
+
+    inline double fast_atof_2(char *str, size_t len);
+
+    double atof_ninja(char *str, size_t len);
 };
 
 

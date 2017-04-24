@@ -4,6 +4,8 @@
 
 #include <cstring>
 #include <cmath>
+#include <sstream>
+#include <iomanip>
 #include "rdf_parser.h"
 #include "metadata_parser.h"
 
@@ -137,7 +139,7 @@ size_t rdf_parser::parse_line(char *line) {
         j = find_character(line, '>', i + machineSkip2);
         i += machineSkip2;
 
-        machine_idx = fast_atoi(line + i, j - i);
+        machine_idx = fast_atof_2(line + i, j - i);
     }
 
         // it's a value
@@ -170,6 +172,21 @@ int rdf_parser::fast_atoi(const char *str, size_t len) {
     return val;
 }
 
+double rdf_parser::atof_ninja(char *str, size_t len) {
+    char c = str[len];
+    str[len] = '\0';
+
+    std::stringstream ss;
+    double r;
+
+    ss << str;
+    std::setprecision(100);
+    ss >> r;
+
+    str[len] = c;
+    return r;
+}
+
 double rdf_parser::fast_atof(char *str, size_t len) {
     char c = str[len];
     str[len] = '\0';
@@ -200,5 +217,41 @@ double rdf_parser::fast_atof(char *str, size_t len) {
     }
 
     str[len] = c;
+
+    r = round(r * 100.0) / 100;
+
     return r;
+}
+
+double rdf_parser::fast_atof_2(char *str, size_t len) {
+    char c = str[len];
+    str[len] = '\0';
+
+    int32_t y = 0;
+    char x = 0;
+
+    bool neg = false;
+    if (*str == '-') {
+        neg = true;
+        ++str;
+    }
+    while (*str >= '0' && *str <= '9') {
+        y = (y*10) + (*str - '0');
+        ++str;
+    }
+    if (*str == '.') {
+
+        x = (*(str+1) - '0');
+
+        if(*(str+2) >= '0' && *(str+2) <= '9') {
+            x += 10 * (*(str+2) - '0');
+        }
+    }
+    if (neg) {
+        y = -y;
+    }
+
+    str[len] = c;
+
+    return y + (x / 100.0);
 }

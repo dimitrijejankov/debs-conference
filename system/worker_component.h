@@ -5,6 +5,7 @@
 #ifndef HOBBITREWRITE_WORKER_COMPONENT_H
 #define HOBBITREWRITE_WORKER_COMPONENT_H
 
+#define NUMBER_OF_WORKERS 1
 
 #include <cstddef>
 #include <list>
@@ -13,9 +14,11 @@
 #include <condition_variable>
 #include <kmeans/kmeans.h>
 #include <metadata_parser.h>
+#include <data/readerwriterqueue.h>
 #include "output_component.h"
 
 using namespace std;
+using namespace concurent;
 
 struct task {
     size_t idx;
@@ -28,14 +31,11 @@ struct task {
 class worker_component {
 private:
 
+    // id of the worker
+    int id;
+
     // tasks
-    list<task> tasks;
-
-    // the mutex to sync the tasks
-    mutex m;
-
-    // conditional variable
-    condition_variable c;
+    blocking_reader_writer_queue<task> tasks;
 
     // kmeans
     kmeans detector;
@@ -45,6 +45,9 @@ private:
 
     // output component
     output_component *oc;
+
+    // counter for workers
+    static int counter;
 
 public:
 

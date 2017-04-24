@@ -1,69 +1,45 @@
 //Created by ss107 on 4/21/17.
 
-#include "kmeans/kmeans.h"
-#include "kmeans/circular_queue.h"
-#include <fstream>
-#include <sstream>
+
+#include <metadata_parser.h>
+#include <kmeans/kmeans.h>
+#include <iomanip>
 
 int main() {
 
-    // Parameters for KMeans:
-    std::cout << "KMeans Testing!\n";
+    metadata_parser mp;
 
-    // Variable Parameter:
-    int numClusters = 5;
+    kmeans km(mp.get_window_size(), mp.get_max_clustering_iterations(), mp.get_clustering_precision(), mp.get_transitions_amount(), mp.get_threshold());
 
-    // Other Fixed Parameters:
-    int windowSize = 10;
-    int maximumIterations = 50;
-    double clusteringPrecision = 0.00001;
-    int smallerWindowSize = 5;
-    double thresholdProbability = 0.005;
+    circular_queue cq(10);
 
+    double values[] = {2.97, 3, 2.94, 2.89, 3.02, 2.95, 2.94, 3.05, 3.05, 2.89};
 
-    std::ifstream file("31.txt");
-    std::string   line;
-    circular_queue * cq = new  circular_queue(windowSize);
+    //double values[] = {2.9699999999999998, 3, 2.9399999999999999, 2.8900000000000001, 3.02, 2.9500000000000002, 2.9399999999999999, 3.0499999999999998, 3.0499999999999998, 2.8900000000000001};
 
-    int i = 0;
+    /*
+    double values[] = {2.9399999999999999,
+                       3.0499999999999998,
+                       3.0499999999999998,
+                       2.8900000000000001,
+                       2.9699999999999998,
+                       3,
+                       2.9399999999999999,
+                       2.8900000000000001,
+                       3.02,
+                       2.9500000000000002};
+   */
 
-    while(std::getline(file, line)) {
-        std::stringstream   lineStream(line);
-        std::string         data;
-
-
-        while(std::getline(lineStream, data, ';')) {
-            //std::cout << data << std::endl;
-        }
-        //std::cout <<  << std::endl;
-
-        sscanf(data.c_str(), "%lf", &cq->next_point().x);
-        cq->point_inserted();
-
-        if (cq->is_full()) {
-            //cq->display();
-            // Create kmeans object:
-            kmeans * k = new kmeans(windowSize, maximumIterations, clusteringPrecision, smallerWindowSize, thresholdProbability);
-            bool hasAnomalies = k->perform_all_calculation(cq, numClusters);
-
-            i++;
-
-            if (hasAnomalies) {
-                std::cout << "Anomaly!" << i << std::endl;
-                printf("%.19lf \n", k->get_result_threshold());
-                //std::cout << k->get_result_threshold() << std::endl;
-                cq->display();
-            }
-        }
-
-
-
+    for(int i = 0; i < 10; i++) {
+        cq.next_point().x = values[i];
+        cq.point_inserted();
     }
 
+    cq.next = 0;
 
+    bool x = km.perform_all_calculation(&cq, 4);
 
-
-
+    printf("%lf\n", km.get_result_threshold());
 
     return 0;
 }

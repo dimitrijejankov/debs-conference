@@ -121,7 +121,7 @@ void kmeans::perform_clustering() {
         double distance = 0;
 
         for (int i = 0; i < num_clusters; i++) {
-            distance += point_distance(old_clusters->get_centroid(), clusters->get_centroid());
+            distance += point_distance(this->old_clusters[i].get_centroid(), this->clusters[i].get_centroid());
         }
 
         // Take into account clustering precision:
@@ -134,6 +134,8 @@ void kmeans::perform_clustering() {
             finish = true;
         }
     }
+
+    assign_cluster();
 }
 
 void kmeans::clear_clusters() {

@@ -7,7 +7,7 @@
 
 struct anomaly {
 
-    size_t index;
+    size_t idx;
 
     size_t machine_no;
     size_t dimension_no;

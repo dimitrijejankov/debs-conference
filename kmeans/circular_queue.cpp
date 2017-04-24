@@ -47,7 +47,7 @@ circular_queue::~circular_queue() {
     delete[] data;
 }
 
-circular_queue::circular_queue(circular_queue &old)  : capacity(old.capacity), next(old.capacity), full(old.full) {
+circular_queue::circular_queue(circular_queue &old)  : capacity(old.capacity), next(old.next), full(old.full) {
 
     // make new new points
     data = new point[capacity];

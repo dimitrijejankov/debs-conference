@@ -11,7 +11,7 @@ string output_component::output_queue_name() {
     return SYSTEM_2_EVAL_STORAGE_QUEUE_NAME() + "." + HOBBIT_SESSION_ID();
 }
 
-output_component::output_component() {
+output_component::output_component() : counter(0), queue(400)  {
     out_channel.socket = NULL;
 
     // init the input channel
@@ -19,18 +19,9 @@ output_component::output_component() {
 
     // init the input amqp_queue
     init_queue(out_channel, out_queue, output_queue_name());
-
-    // make the comparator for the anomalies
-    auto cmp = [](anomaly& left, anomaly& right) { return left.index < right.index;};
-
-    // init the priority amqp_queue
-    buffer = new priority_queue<anomaly, vector<anomaly>, std::function<bool(anomaly&, anomaly&)>>(cmp);
 }
 
 output_component::~output_component() {
-
-    // free the buffer
-    delete buffer;
 
     // close the channel
     die_on_amqp_error(amqp_channel_close(out_channel.conn, 1, AMQP_REPLY_SUCCESS), "Closing channel");
@@ -86,40 +77,33 @@ void output_component::send(const string value) {
 
 void output_component::output_anomaly(size_t idx, size_t machine_no, size_t dimension_no, double final_threshold, size_t timestamp) {
 
-    // grab a lock for the buffer
-    unique_lock<mutex> u(m_b);
-
     // just so we don't have to grab new memory each time
-
     static anomaly tmp;
 
+    tmp.idx = idx;
     tmp.machine_no = machine_no;
     tmp.dimension_no = dimension_no;
     tmp.final_threshold = final_threshold;
     tmp.timestamp = timestamp;
 
     // push the anomaly into the buffer.
-    buffer->push(tmp);
-
-    // tell the output to send the anomalies
-    c_b.notify_one();
+    queue.enqueue(tmp);
 }
 
 void output_component::run() {
 
-    unique_lock<mutex> lk(m_b);
+    // grab the anomaly
+    anomaly a;
 
     for(;;) {
 
-        // wait until we have something in the buffer
-        c_b.wait(lk, [this]{return !this->buffer->empty();});
+        // grab the anomaly
+        queue.wait_dequeue(a);
 
-        // pop the anomaly
-        buffer->pop();
-
-        size_t xx = buffer->size();
-
-        // send the output
-        send("Ninja");
+        printf("index : %ld, dimension : %lu, machine : %lu, timestamp : %lu, threshold : %lf\n", counter++,
+                                                                                                   a.dimension_no,
+                                                                                                   a.machine_no,
+                                                                                                   a.timestamp,
+                                                                                                   a.final_threshold);
     }
 }

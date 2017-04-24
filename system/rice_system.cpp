@@ -15,7 +15,9 @@ rice_system::rice_system() {
     oc = new output_component();
 
     // add the workers
-    workers.push_back(new worker_component(oc, &mp));
+    for(int i = 0; i < NUMBER_OF_WORKERS; i++) {
+        workers.push_back(new worker_component(oc, &mp));
+    }
 
     //TODO fix the windows sizes
     ic = new input_component(&mp, workers);
@@ -53,7 +55,7 @@ void rice_system::run() {
     // detach the command
     output_thread.detach();
 
-    /*worker_component *tmp = *workers.begin();
+    worker_component *tmp = *workers.begin();
 
     // run each worker
     for(auto w = workers.begin(); w != workers.end(); w++) {
@@ -69,7 +71,6 @@ void rice_system::run() {
         // detach the thread
         t.detach();
     }
-    */
 
     // log the action
     printf("Sending SYSTEM_READY_SIGNAL...\n");

@@ -5,6 +5,9 @@ include(CheckCSourceCompiles)
 # set the standard to C++ 11
 set(CMAKE_CXX_STANDARD 11)
 
+# set o3
+set(CMAKE_CXX_FLAGS -O2)
+
 #find pthreads
 find_package (Threads)
 
@@ -53,3 +56,12 @@ target_link_libraries(KmeansTest ${RABBITMQ_LIBRARIES})
 
 # link pthreads
 target_link_libraries (KmeansTest ${CMAKE_THREAD_LIBS_INIT})
+
+# set the executable
+add_executable(ParseTest ${SOURCE_FILES} test/parse_test.cpp parameters.cpp utils.cpp)
+
+# link rabbitmq
+target_link_libraries(ParseTest ${RABBITMQ_LIBRARIES})
+
+# link pthreads
+target_link_libraries (ParseTest ${CMAKE_THREAD_LIBS_INIT})

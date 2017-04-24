@@ -10,7 +10,10 @@
 #include <queue>
 #include <condition_variable>
 #include "component.h"
+#include "data/readerwriterqueue.h"
 #include "data/anormaly.h"
+
+using namespace concurent;
 
 class output_component : public component {
 private:
@@ -27,14 +30,11 @@ private:
     // mutex to sync the output
     mutex m;
 
-    // mutex to sync the buffer
-    mutex m_b;
+    // anomaly counter
+    size_t counter;
 
-    // condition variable to sync the buffer
-    condition_variable c_b;
-
-    // buffer for the anomalies
-    priority_queue<anomaly, vector<anomaly>, std::function<bool(anomaly&, anomaly&)>> *buffer;
+    // queue for the anomalies
+    blocking_reader_writer_queue<anomaly> queue;
 
 public:
 
