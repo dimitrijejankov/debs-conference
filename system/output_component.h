@@ -13,6 +13,30 @@
 #include "data/readerwriterqueue.h"
 #include "data/anormaly.h"
 
+// the beginning of each line
+#define ANOMALY_BEGIN "<http://project-hobbit.eu/resources/debs2017#Anomaly_"
+
+// end of the line
+#define ANOMALY_END "> .\n"
+
+// the end for the first line
+#define ANOMALY_LINE_1_PT_1 "> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.agtinternational.com/ontologies/DEBSAnalyticResults#Anomaly> .\n"
+
+// the second line of the anomaly - the machine number
+#define ANOMALY_LINE_2_PT_1 "> <http://www.agtinternational.com/ontologies/I4.0#machine> <http://www.agtinternational.com/ontologies/WeidmullerMetadata#Machine_"
+
+// the third line - the machine dimension
+#define ANOMALY_LINE_3_PT_1 "> <http://www.agtinternational.com/ontologies/DEBSAnalyticResults#inAbnormalDimension> <http://www.agtinternational.com/ontologies/WeidmullerMetadata#_"
+
+// the timestamp
+#define ANOMALY_LINE_4_PT_1 "> <http://www.agtinternational.com/ontologies/DEBSAnalyticResults#hasTimeStamp> <http://project-hobbit.eu/resources/debs2017#Timestamp_"
+
+// the probability part 2
+#define ANOMALY_LINE_5_PT_1 "> <http://www.agtinternational.com/ontologies/DEBSAnalyticResults#hasProbabilityOfObservedAbnormalSequence> \""
+
+// the probability part 1
+#define ANOMALY_LINE_5_PT_2 "\"^^<http://www.w3.org/2001/XMLSchema#double> .\n"
+
 using namespace concurent;
 
 class output_component : public component {
@@ -35,6 +59,36 @@ private:
 
     // queue for the anomalies
     blocking_reader_writer_queue<anomaly> queue;
+
+    // message buffer
+    char message_buffer[4000];
+
+    // fill the string buffer
+    size_t fill_buffer(size_t count, size_t &machine_no, size_t &dimension_no, double &final_threshold, size_t &timestamp);
+
+    //
+    size_t ANOMALY_BEGIN_LEN;
+
+    // end of the line length
+    size_t ANOMALY_END_LEN;
+
+    // the end for the first line length
+    size_t ANOMALY_LINE_1_PT_1_LEN;
+
+    // the second line of the anomaly length - the machine number
+    size_t ANOMALY_LINE_2_PT_1_LEN;
+
+    // the third line length - the machine dimension
+    size_t ANOMALY_LINE_3_PT_1_LEN;
+
+    // the timestamp length
+    size_t ANOMALY_LINE_4_PT_1_LEN;
+
+    // the probability part 2 length
+    size_t ANOMALY_LINE_5_PT_1_LEN;
+
+    // the probability part 1 length
+    size_t ANOMALY_LINE_5_PT_2_LEN;
 
 public:
 

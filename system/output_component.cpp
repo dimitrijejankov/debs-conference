@@ -2,6 +2,7 @@
 // Created by dimitrije on 16/04/17.
 //
 
+#include <cstring>
 #include "output_component.h"
 #include "parameters.h"
 #include "utils.h"
@@ -19,6 +20,31 @@ output_component::output_component() : counter(0), queue(400)  {
 
     // init the input amqp_queue
     init_queue(out_channel, out_queue, output_queue_name());
+
+
+    // the length of the anomaly begin
+    ANOMALY_BEGIN_LEN = strlen(ANOMALY_BEGIN);
+
+    // end of the line length
+    ANOMALY_END_LEN = strlen(ANOMALY_END);
+
+    // the end for the first line length
+    ANOMALY_LINE_1_PT_1_LEN = strlen(ANOMALY_LINE_1_PT_1);
+
+    // the second line of the anomaly length - the machine number
+    ANOMALY_LINE_2_PT_1_LEN = strlen(ANOMALY_LINE_2_PT_1);
+
+    // the third line length - the machine dimension
+    ANOMALY_LINE_3_PT_1_LEN = strlen(ANOMALY_LINE_3_PT_1);
+
+    // the timestamp length
+    ANOMALY_LINE_4_PT_1_LEN = strlen(ANOMALY_LINE_4_PT_1);
+
+    // the probability part 2 length
+    ANOMALY_LINE_5_PT_1_LEN = strlen(ANOMALY_LINE_5_PT_1);
+
+    // the probability part 1 length
+    ANOMALY_LINE_5_PT_2_LEN = strlen(ANOMALY_LINE_5_PT_2);
 }
 
 output_component::~output_component() {
@@ -99,11 +125,184 @@ void output_component::run() {
 
         // grab the anomaly
         queue.wait_dequeue(a);
+        size_t size = fill_buffer(counter++, a.machine_no, a.dimension_no, a.final_threshold, a.timestamp);
 
+        send(message_buffer, size);
+        /*
         printf("index : %ld, dimension : %lu, machine : %lu, timestamp : %lu, threshold : %lf\n", counter++,
                                                                                                    a.dimension_no,
                                                                                                    a.machine_no,
                                                                                                    a.timestamp,
                                                                                                    a.final_threshold);
+                                                                                                   */
     }
+}
+
+size_t output_component::fill_buffer(size_t anomaly_no, size_t &machine_no, size_t &dimension_no, double &final_threshold,
+                                   size_t &timestamp) {
+
+    char machine_string[5];
+    char anomaly_string[5];
+    char dimension_string[5];
+    char timestamp_string[10];
+    char probability_string[30];
+
+    sprintf(machine_string, "%lu", machine_no);
+    sprintf(anomaly_string, "%lu", anomaly_no);
+    sprintf(dimension_string, "%lu", dimension_no);
+    sprintf(timestamp_string, "%lu", timestamp);
+    sprintf(probability_string, "%.16lg", final_threshold);
+
+    size_t machine_string_len = strlen(machine_string);
+    size_t anomaly_string_len = strlen(anomaly_string);
+    size_t dimension_string_len = strlen(dimension_string);
+    size_t timestamp_string_len = strlen(timestamp_string);
+    size_t probability_string_len = strlen(probability_string);
+
+
+    char *offset = message_buffer;
+
+    /// start of the line 1
+
+    // copy the beginning
+    memccpy(offset, ANOMALY_BEGIN, sizeof(char), ANOMALY_BEGIN_LEN);
+
+    // increase the offset
+    offset += ANOMALY_BEGIN_LEN;
+
+    // copy the anomaly number
+    memccpy(offset, anomaly_string, sizeof(char), anomaly_string_len);
+
+    // increase the offset
+    offset += anomaly_string_len;
+
+    // copy the line part 1
+    memccpy(offset, ANOMALY_LINE_1_PT_1, sizeof(char), ANOMALY_LINE_1_PT_1_LEN);
+
+    // increase the offset
+    offset += ANOMALY_LINE_1_PT_1_LEN;
+
+    /// start of the line 2
+
+    // copy the beginning and the anomaly number
+    memccpy(offset, message_buffer, sizeof(char), ANOMALY_BEGIN_LEN + anomaly_string_len);
+
+    // increase the offset
+    offset += ANOMALY_BEGIN_LEN + anomaly_string_len;
+
+    // copy the beginning and the ANOMALY_LINE_2_PT_1
+    memccpy(offset, ANOMALY_LINE_2_PT_1, sizeof(char), ANOMALY_LINE_2_PT_1_LEN);
+
+    // increase the offset
+    offset += ANOMALY_LINE_2_PT_1_LEN;
+
+    // copy the machine_string
+    memccpy(offset, machine_string, sizeof(char), machine_string_len);
+
+    // increase the offset
+    offset += machine_string_len;
+
+    // copy the anomaly end
+    memccpy(offset, ANOMALY_END, sizeof(char), ANOMALY_END_LEN);
+
+    // increase the offset
+    offset += ANOMALY_END_LEN;
+
+    /// start of line 3
+
+    // copy the beginning and the anomaly number
+    memccpy(offset, message_buffer, sizeof(char), ANOMALY_BEGIN_LEN + anomaly_string_len);
+
+    // increase the offset
+    offset += ANOMALY_BEGIN_LEN + anomaly_string_len;
+
+    // copy the beginning and the ANOMALY_LINE_3_PT_1
+    memccpy(offset, ANOMALY_LINE_3_PT_1, sizeof(char), ANOMALY_LINE_3_PT_1_LEN);
+
+    // increase the offset
+    offset += ANOMALY_LINE_3_PT_1_LEN;
+
+    // copy the machine_string
+    memccpy(offset, machine_string, sizeof(char), machine_string_len);
+
+    // increase the offset
+    offset += machine_string_len;
+
+    // add the underscore
+    *offset = '_';
+
+    // increase the offset
+    offset++;
+
+    // copy the dimension string
+    memccpy(offset, dimension_string, sizeof(char), dimension_string_len);
+
+    // increase the offset
+    offset += dimension_string_len;
+
+    // copy the anomaly end
+    memccpy(offset, ANOMALY_END, sizeof(char), ANOMALY_END_LEN);
+
+    // increase the offset
+    offset += ANOMALY_END_LEN;
+
+    /// start of line 4
+
+    // copy the beginning and the anomaly number
+    memccpy(offset, message_buffer, sizeof(char), ANOMALY_BEGIN_LEN + anomaly_string_len);
+
+    // increase the offset
+    offset += ANOMALY_BEGIN_LEN + anomaly_string_len;
+
+    // copy the beginning and the ANOMALY_LINE4_PT_1
+    memccpy(offset, ANOMALY_LINE_4_PT_1, sizeof(char), ANOMALY_LINE_4_PT_1_LEN);
+
+    // increase the offset
+    offset += ANOMALY_LINE_4_PT_1_LEN;
+
+    // copy the dimension string
+    memccpy(offset, timestamp_string, sizeof(char), timestamp_string_len);
+
+    // increase the offset
+    offset += timestamp_string_len;
+
+    // copy the anomaly end
+    memccpy(offset, ANOMALY_END, sizeof(char), ANOMALY_END_LEN);
+
+    // increase the offset
+    offset += ANOMALY_END_LEN;
+
+    /// start of line 5
+
+    // copy the beginning and the anomaly number
+    memccpy(offset, message_buffer, sizeof(char), ANOMALY_BEGIN_LEN + anomaly_string_len);
+
+    // increase the offset
+    offset += ANOMALY_BEGIN_LEN + anomaly_string_len;
+
+    // copy the beginning and the ANOMALY_LINE5_PT_1
+    memccpy(offset, ANOMALY_LINE_5_PT_1, sizeof(char), ANOMALY_LINE_5_PT_1_LEN);
+
+    // increase the offset
+    offset += ANOMALY_LINE_5_PT_1_LEN;
+
+    // copy the dimension string
+    memccpy(offset, probability_string, sizeof(char), probability_string_len);
+
+    // increase the offset
+    offset += probability_string_len;
+
+    // copy the beginning and the ANOMALY_LINE5_PT_1
+    memccpy(offset, ANOMALY_LINE_5_PT_2, sizeof(char), ANOMALY_LINE_5_PT_2_LEN);
+
+    // increase the offset
+    offset += ANOMALY_LINE_5_PT_2_LEN;
+
+    // add the end line
+    *offset = '\0';
+
+    // increase the offset
+    offset++;
+
+    return offset - this->message_buffer;
 }

@@ -31,8 +31,6 @@ void worker_component::queue_task(size_t idx, size_t machine_no, size_t dimensio
 
 void worker_component::run() {
 
-    static int x = 0;
-
     // for task grabbing
     task tmp;
 
@@ -46,7 +44,8 @@ void worker_component::run() {
 
         // if we have detected an anomaly
         if(detected) {
-            printf("anomaly : %d, thrashould %.16lg, timestamp : %d, machine number %d, dimension %d \n", x++, detector.get_result_threshold(), (int)tmp.timestamp, (int)tmp.machine_no, (int)tmp.dimension_no);
+            //printf("anomaly : %d, thrashould %.16lg, timestamp : %d, machine number %d, dimension %d \n", x++, detector.get_result_threshold(), (int)tmp.timestamp, (int)tmp.machine_no, (int)tmp.dimension_no);
+            oc->output_anomaly(tmp.idx, tmp.machine_no, tmp.dimension_no, detector.get_result_threshold(), tmp.timestamp);
         }
 
         /// TODO update so we don't have to do this
