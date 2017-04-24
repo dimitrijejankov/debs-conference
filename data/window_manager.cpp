@@ -57,7 +57,7 @@ void window_manager::push_data(size_t machine_no, size_t dimension_no, size_t ti
 
         if(w->is_full()) {
             // run the kmeans on one of the workers
-            workers[hash % workers.size()]->queue_task(idx++, machine_no, dimension_no, timestamps[hash]->get_point(window_size- smaller_window_size - 1), w);
+            workers[hash % workers.size()]->queue_task(idx++, machine_no, dimension_no, timestamps[hash]->get_point(window_size - smaller_window_size - 1), w);
         }
     }
 }
