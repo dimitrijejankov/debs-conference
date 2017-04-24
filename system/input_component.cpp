@@ -7,7 +7,7 @@
 #include "parameters.h"
 #include "utils.h"
 
-input_component::input_component(metadata_parser *mp, vector<worker_component*> workers) : wm(mp->get_window_size(), workers) {
+input_component::input_component(metadata_parser *mp, vector<worker_component*> workers) : wm(mp->get_window_size(), mp->get_transitions_amount(), workers) {
     // set the input socket to NULL
     in_channel.socket = NULL;
 
