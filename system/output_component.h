@@ -12,6 +12,7 @@
 #include "component.h"
 #include "data/readerwriterqueue.h"
 #include "data/anormaly.h"
+#include "data/java_double_parser.h"
 
 // the beginning of each line
 #define ANOMALY_BEGIN "<http://project-hobbit.eu/resources/debs2017#Anomaly_"
@@ -50,6 +51,9 @@ private:
 
     // the response queue
     amqp_queue out_queue;
+
+    // java parser (UNHOLY
+    java_double_parser *jdp;
 
     // mutex to sync the output
     mutex m;

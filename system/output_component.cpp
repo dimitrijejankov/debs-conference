@@ -3,9 +3,12 @@
 //
 
 #include <cstring>
+#include <sstream>
+#include <cfenv>
 #include "output_component.h"
 #include "parameters.h"
 #include "utils.h"
+
 
 
 string output_component::output_queue_name() {
@@ -121,20 +124,18 @@ void output_component::run() {
     // grab the anomaly
     anomaly a;
 
+    jdp = new java_double_parser();
+
     for(;;) {
 
         // grab the anomaly
         queue.wait_dequeue(a);
         size_t size = fill_buffer(counter++, a.machine_no, a.dimension_no, a.final_threshold, a.timestamp);
 
+        //printf(this->message_buffer);
+
         send(message_buffer, size);
-        /*
-        printf("index : %ld, dimension : %lu, machine : %lu, timestamp : %lu, threshold : %lf\n", counter++,
-                                                                                                   a.dimension_no,
-                                                                                                   a.machine_no,
-                                                                                                   a.timestamp,
-                                                                                                   a.final_threshold);
-                                                                                                   */
+
     }
 }
 
@@ -142,16 +143,16 @@ size_t output_component::fill_buffer(size_t anomaly_no, size_t &machine_no, size
                                    size_t &timestamp) {
 
     char machine_string[5];
-    char anomaly_string[5];
+    char anomaly_string[20];
     char dimension_string[5];
-    char timestamp_string[10];
-    char probability_string[30];
+    char timestamp_string[20];
+    const char *probability_string = jdp->toString(final_threshold);
 
     sprintf(machine_string, "%lu", machine_no);
     sprintf(anomaly_string, "%lu", anomaly_no);
     sprintf(dimension_string, "%lu", dimension_no);
     sprintf(timestamp_string, "%lu", timestamp);
-    sprintf(probability_string, "%.16lg", final_threshold);
+
 
     size_t machine_string_len = strlen(machine_string);
     size_t anomaly_string_len = strlen(anomaly_string);

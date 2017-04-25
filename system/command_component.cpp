@@ -50,6 +50,8 @@ void command_component::send_to_cmd_queue(char command, char *data, size_t lengt
         dataLength += length;
     }
 
+    dataLength += 1000;
+
     // allocate the buffer
     char* buffer = (char*)malloc(sizeof(char) * length);
 

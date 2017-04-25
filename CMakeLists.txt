@@ -11,6 +11,14 @@ set(CMAKE_CXX_FLAGS -O2)
 #find pthreads
 find_package (Threads)
 
+# find jni
+find_package(JNI)
+
+if (JNI_FOUND)
+    message (STATUS "JNI_INCLUDE_DIRS=${JNI_INCLUDE_DIRS}")
+    message (STATUS "JNI_LIBRARIES=${JNI_LIBRARIES}")
+endif()
+
 # find the RabbitMQ
 find_library(RABBITMQ_LIBRARIES NAMES rabbitmq)
 find_path(RABBITMQ_HEADERS amqp.h)
@@ -25,7 +33,7 @@ else()
 endif()
 
 # set the include directories
-include_directories(parser system .)
+include_directories(parser system . ${JNI_INCLUDE_DIRS})
 
 # if found include the RabbitMQ
 set(CMAKE_REQUIRED_INCLUDES ${RABBITMQ_HEADERS})
@@ -40,13 +48,16 @@ file(GLOB PROJECT_HEADERS "system/*.h" "parser/*.h" "kmeans/*.h" "*.h" "data/*.h
 set(SOURCE_FILES ${PROJECT_SOURCE} ${PROJECT_HEADERS})
 
 # set the executable
-add_executable(HobbitRewrite ${SOURCE_FILES} main.cpp parameters.cpp utils.cpp parser/metadata_parser.cpp parser/metadata_parser.h data/timestamp_queue.cpp data/timestamp_queue.h)
+add_executable(HobbitRewrite ${SOURCE_FILES} main.cpp parameters.cpp utils.cpp parser/metadata_parser.cpp parser/metadata_parser.h data/timestamp_queue.cpp data/timestamp_queue.h data/java_double_parser.cpp data/java_double_parser.h)
 
 # link rabbitmq
 target_link_libraries(HobbitRewrite ${RABBITMQ_LIBRARIES})
 
 # link pthreads
 target_link_libraries (HobbitRewrite ${CMAKE_THREAD_LIBS_INIT})
+
+# link jni
+target_link_libraries (HobbitRewrite ${JNI_LIBRARIES})
 
 # set the executable
 add_executable(KmeansTest ${SOURCE_FILES} test/kmeans_main.cpp parameters.cpp utils.cpp)
@@ -65,3 +76,6 @@ target_link_libraries(ParseTest ${RABBITMQ_LIBRARIES})
 
 # link pthreads
 target_link_libraries (ParseTest ${CMAKE_THREAD_LIBS_INIT})
+
+# link jni
+target_link_libraries (ParseTest ${JNI_LIBRARIES})
