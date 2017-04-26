@@ -59,10 +59,12 @@ public:
     ~command_component();
 
     // receive command
-    void receive_command(char command, char* remainingData, size_t length);
+    void receive_command(char command, char *remainingData, size_t length, mutex &mutex1,
+                         condition_variable &variable);
 
     // handle command
-    void handle_command(char* bytes, size_t length, amqp_basic_properties_t props);
+    void handle_command(char *bytes, size_t length, amqp_basic_properties_t props,
+                        condition_variable &variable, mutex &mutex1);
 
     // send bytes to the command amqp_queue
     void send_to_cmd_queue(char command);
@@ -76,7 +78,11 @@ public:
     // swap endian
     inline void swap_endian(int32_t &value);
 
-    void run();
+    // run the command component
+    void run(condition_variable &cv, mutex &m);
+
+    // get task generation finished
+    bool generation_finished() const;
 };
 
 

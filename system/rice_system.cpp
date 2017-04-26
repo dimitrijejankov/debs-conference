@@ -41,7 +41,7 @@ void rice_system::run() {
 
     // run the command component
     std::thread command_thread ([this]() {
-        this->cr->run();
+        this->cr->run(this->cv, this->m);
     });
 
     // detach the command
@@ -78,6 +78,13 @@ void rice_system::run() {
     // send the system ready signal
     cr->send_to_cmd_queue(SYSTEM_READY_SIGNAL);
 
+    // log the action
+    printf("Waiting for TASK_GENERATION_FINISHED...\n");
+
+    // waiting for the task generation finished
+    cv.wait(lk, [this]{return this->cr->generation_finished();});
+
+    // wait for the termination message.
     printf("Waiting for termination message...\n");
 
     // make a conditional variable flow until we finish...
@@ -85,6 +92,8 @@ void rice_system::run() {
 
     printf("Sending termination message...\n");
     oc->send(TERMINATION_MESSAGE);
+
+    exit(0);
 }
 
 rice_system::~rice_system() {

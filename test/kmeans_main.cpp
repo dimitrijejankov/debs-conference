@@ -35,7 +35,7 @@ int main() {
         cq.point_inserted();
     }
 
-    cq.next = 0;
+    //cq.next = 0;
 
     bool x = km.perform_all_calculation(&cq, 4);
 

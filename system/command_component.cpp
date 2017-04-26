@@ -3,6 +3,7 @@
 //
 
 #include <cstring>
+#include <condition_variable>
 #include "command_component.h"
 #include "parameters.h"
 #include "utils.h"
@@ -88,7 +89,7 @@ void command_component::send_to_cmd_queue(char command, char *data, size_t lengt
     free(buffer);
 }
 
-void command_component::run() {
+void command_component::run(condition_variable &cv, mutex &m) {
 
     // start the consuming
     amqp_basic_consume(response_channel.conn, 1, amqp_cstring_bytes(response_queue_name.c_str()), amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
@@ -108,14 +109,16 @@ void command_component::run() {
             }
 
             // parse the input..
-            handle_command((char*)envelope.message.body.bytes, envelope.message.body.len, envelope.message.properties);
+            handle_command((char *) envelope.message.body.bytes, envelope.message.body.len, envelope.message.properties,
+                           cv, m);
 
             amqp_destroy_envelope(&envelope);
         }
     }
 }
 
-void command_component::handle_command(char* bytes, size_t length, amqp_basic_properties_t props) {
+void command_component::handle_command(char *bytes, size_t length, amqp_basic_properties_t props,
+                                       condition_variable &c, mutex &m) {
     // allocate on stack for the command session id length
     int32_t command_session_len;
 
@@ -148,16 +151,20 @@ void command_component::handle_command(char* bytes, size_t length, amqp_basic_pr
         }
 
         // process the received command
-        receive_command(command, remainingData, remainingDataLen);
+        receive_command(command, remainingData, remainingDataLen, m, c);
     }
 }
 
-void command_component::receive_command(char command, char *remainingData, size_t length) {
+void command_component::receive_command(char command, char *remainingData, size_t length, mutex &m,
+                                        condition_variable &c) {
     if (command == DOCKER_CONTAINER_TERMINATED) {
         // TODO implement container observers
     }
     else if (command == TASK_GENERATION_FINISHED) {
+        m.lock();
         task_generation_finished = true;
+        m.unlock();
+        c.notify_one();
     }
 }
 
@@ -174,4 +181,8 @@ command_component::~command_component() {
 
 void command_component::swap_endian(int32_t &value) {
     value = ( value >> 24 ) | (( value << 8) & 0x00ff0000 )| ((value >> 8) & 0x0000ff00) | ( value << 24);
+}
+
+bool command_component::generation_finished() const {
+    return task_generation_finished;
 }

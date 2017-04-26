@@ -66,7 +66,8 @@ void input_component::run(condition_variable &cv, mutex &m) {
         }
 
         // if we got a termination message we notify the main thread about it...
-        if(strncmp(TERMINATION_MESSAGE, (char*)envelope.message.body.bytes, TERMINATION_MESSAGE_SIZE) == 0) {
+        //if(strncmp(TERMINATION_MESSAGE, (char*)envelope.message.body.bytes, TERMINATION_MESSAGE_SIZE) == 0) {
+        if(envelope.message.body.len == TERMINATION_MESSAGE_SIZE) {
             m.lock();
             finished = true;
             m.unlock();
