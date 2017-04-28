@@ -128,6 +128,8 @@ void output_component::run() {
         size_t size = fill_buffer(counter++, a.machine_no, a.dimension_no, a.final_threshold, a.timestamp);
 
         send(message_buffer, size);
+
+        printf(message_buffer);
         /*
         printf("index : %ld, dimension : %lu, machine : %lu, timestamp : %lu, threshold : %lf\n", counter++,
                                                                                                    a.dimension_no,
@@ -151,7 +153,10 @@ size_t output_component::fill_buffer(size_t anomaly_no, size_t &machine_no, size
     sprintf(anomaly_string, "%lu", anomaly_no);
     sprintf(dimension_string, "%lu", dimension_no);
     sprintf(timestamp_string, "%lu", timestamp);
-    sprintf(probability_string, "%.16lg", final_threshold);
+
+    dc.getBinaryToASCIIConverter(final_threshold, true);
+    dc.copy_to_string(probability_string);
+    //sprintf(probability_string, "%.16lg", final_threshold);
 
     size_t machine_string_len = strlen(machine_string);
     size_t anomaly_string_len = strlen(anomaly_string);

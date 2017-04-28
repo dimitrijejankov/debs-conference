@@ -9,6 +9,7 @@
 #include <vector>
 #include <queue>
 #include <condition_variable>
+#include <data/double_converter.h>
 #include "component.h"
 #include "data/readerwriterqueue.h"
 #include "data/anormaly.h"
@@ -50,6 +51,9 @@ private:
 
     // the response queue
     amqp_queue out_queue;
+
+    // double converter
+    double_converter dc;
 
     // mutex to sync the output
     mutex m;
