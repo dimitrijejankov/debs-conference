@@ -31,6 +31,9 @@ struct task {
 class worker_component {
 private:
 
+    // timeout
+    static const int TIMEOUT = 5000000;
+
     // id of the worker
     int id;
 
@@ -49,6 +52,9 @@ private:
     // counter for workers
     static int counter;
 
+    // is the system finished
+    atomic_bool is_finished;
+
 public:
 
     // constructor
@@ -59,6 +65,9 @@ public:
 
     // run the worker
     void run();
+
+    // setter for is finished
+    void set_is_finished(bool);
 };
 
 

@@ -6,6 +6,7 @@
 #define HOBBITREWRITE_SYSTEM_H
 
 #include <string>
+#include <thread>
 #include <amqp.h>
 #include <amqp_tcp_socket.h>
 #include <sys/socket.h>
@@ -41,6 +42,9 @@ private:
 
     // workers
     vector<worker_component*> workers;
+
+    // threads for all the workers
+    vector<std::thread*> workers_threads;
 
 public:
 

@@ -43,6 +43,9 @@ using namespace concurent;
 class output_component : public component {
 private:
 
+    // timeout
+    static const int TIMEOUT = 5000000;
+
     // returns the output queue name
     string output_queue_name();
 
@@ -94,6 +97,9 @@ private:
     // the probability part 1 length
     size_t ANOMALY_LINE_5_PT_2_LEN;
 
+    // is the system finished.
+    atomic_bool is_finished;
+
 public:
 
     // constructor
@@ -112,6 +118,8 @@ public:
 
     // run the component
     void run();
+
+    void set_is_finished(bool value);
 };
 
 

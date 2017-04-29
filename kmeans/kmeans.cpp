@@ -135,12 +135,17 @@ void kmeans::perform_clustering() {
         }
     }
 
+    // clear the points one more time...
+    clear_clusters();
+
+    // assign the clusters one more time..
     assign_cluster();
 }
 
 void kmeans::clear_clusters() {
     for (int i = 0; i < num_clusters; i++) {
-        clusters[i].get_points_num() = 0;
+        clusters[i].clear();
+        //old_clusters[i].clear();
     }
 }
 

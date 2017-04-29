@@ -26,8 +26,8 @@ command_component::command_component() {
     // insert the session id
     accepted_command_headers.insert(session_id);
 
-    // system is ready
-    task_generation_finished = false;
+    // system is finished
+    is_finished = false;
 
 }
 
@@ -51,7 +51,7 @@ void command_component::send_to_cmd_queue(char command, char *data, size_t lengt
     }
 
     // allocate the buffer
-    char* buffer = (char*)malloc(sizeof(char) * length);
+    char* buffer = (char*)malloc(sizeof(char) * dataLength);
 
     // copy the session id length
     memcpy(buffer, &session_id_len, sizeof(int32_t));
@@ -92,6 +92,13 @@ void command_component::run() {
     amqp_basic_consume(response_channel.conn, 1, amqp_cstring_bytes(response_queue_name.c_str()), amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
     die_on_amqp_error(amqp_get_rpc_reply(response_channel.conn), "Consuming");
 
+    // make a time interval
+    timeval timeout;
+
+    // set the timeout for the message consumption to 5 seconds so we don't block the thread.
+    timeout.tv_sec = 5;
+    timeout.tv_usec = 0;
+
     {
         for (;;) {
             amqp_rpc_reply_t res;
@@ -99,9 +106,21 @@ void command_component::run() {
 
             amqp_maybe_release_buffers(response_channel.conn);
 
-            res = amqp_consume_message(response_channel.conn, &envelope, NULL, 0);
+            // consume the message with timeout
+            res = amqp_consume_message(response_channel.conn, &envelope, &timeout, 0);
 
-            if (AMQP_RESPONSE_NORMAL != res.reply_type) {
+            // if we had a timeout and the program has finished finish this thread.
+            if(res.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION && is_finished) {
+                break;
+            }
+
+            // if we had a timeout continue
+            if(res.reply_type == AMQP_RESPONSE_LIBRARY_EXCEPTION) {
+                continue;
+            }
+
+            // if we got something else finish
+            if (res.reply_type != AMQP_RESPONSE_NORMAL) {
                 break;
             }
 
@@ -155,7 +174,7 @@ void command_component::receive_command(char command, char *remainingData, size_
         // TODO implement container observers
     }
     else if (command == TASK_GENERATION_FINISHED) {
-        task_generation_finished = true;
+        // TODO do something...
     }
 }
 
@@ -172,4 +191,8 @@ command_component::~command_component() {
 
 void command_component::swap_endian(int32_t &value) {
     value = ( value >> 24 ) | (( value << 8) & 0x00ff0000 )| ((value >> 8) & 0x0000ff00) | ( value << 24);
+}
+
+void command_component::set_is_finished(bool value) {
+    this->is_finished = value;
 }

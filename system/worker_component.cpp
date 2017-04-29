@@ -36,8 +36,18 @@ void worker_component::run() {
 
     for(;;) {
 
-        // grab the first task
-        tasks.wait_dequeue(tmp);
+        // grab the first task with timeout of 5 seconds
+        bool grabbed = tasks.wait_dequeue_timed(tmp, TIMEOUT);
+
+        // if the system is finished and there is nothing in the queue finish the thread
+        if(!grabbed && is_finished) {
+            break;
+        }
+
+        // if we don't have an anomaly continue
+        if(!grabbed) {
+            continue;
+        }
 
         // preform calculations
         bool detected = detector.perform_all_calculation(tmp.w, mp->get_cluster_no(tmp.machine_no)[tmp.dimension_no]);
@@ -53,8 +63,12 @@ void worker_component::run() {
     }
 }
 
-worker_component::worker_component(output_component *oc, metadata_parser *mp) : oc(oc), mp(mp), tasks(300), detector(mp->get_window_size(),
-                                                                                                            mp->get_max_clustering_iterations(),
-                                                                                                            mp->get_clustering_precision(),
-                                                                                                            mp->get_transitions_amount(),
-                                                                                                            mp->get_threshold()) { id = counter++; }
+worker_component::worker_component(output_component *oc, metadata_parser *mp) : oc(oc), mp(mp), tasks(300), is_finished(false), detector(mp->get_window_size(),
+                                                                                                                                mp->get_max_clustering_iterations(),
+                                                                                                                                mp->get_clustering_precision(),
+                                                                                                                                mp->get_transitions_amount(),
+                                                                                                                                mp->get_threshold()) { id = counter++; }
+
+void worker_component::set_is_finished(bool value) {
+    is_finished = value;
+}

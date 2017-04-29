@@ -36,24 +36,15 @@ void rice_system::run() {
         this->ic->run(this->cv, this->m);
     });
 
-    // detach the input thread
-    input_thread.detach();
-
     // run the command component
     std::thread command_thread ([this]() {
         this->cr->run();
     });
 
-    // detach the command
-    command_thread.detach();
-
     // run the output component
     std::thread output_thread ([this]() {
         this->oc->run();
     });
-
-    // detach the command
-    output_thread.detach();
 
     worker_component *tmp = *workers.begin();
 
@@ -64,12 +55,12 @@ void rice_system::run() {
         tmp = *w;
 
         // run the worker
-        std::thread t ([tmp]() {
+        std::thread *t = new std::thread ([tmp]() {
             tmp->run();
         });
 
-        // detach the thread
-        t.detach();
+        // store the pointer to the thread
+        workers_threads.push_back(t);
     }
 
     // log the action
@@ -85,21 +76,52 @@ void rice_system::run() {
 
     printf("Sending termination message...\n");
     oc->send(TERMINATION_MESSAGE);
+
+    // notify the command component that we have finished
+    cr->set_is_finished(true);
+
+    // notify all worker components
+    for(auto it = workers.begin(); it != workers.end(); ++it) {
+        (*it)->set_is_finished(true);
+    }
+
+    // notify the output component
+    oc->set_is_finished(true);
+
+    // join the command thread.
+    command_thread.join();
+
+    // join the input thread...
+    input_thread.join();
+
+    // join all the workers threads
+    for(auto it = workers_threads.begin(); it != workers_threads.end(); ++it) {
+        (*it)->join();
+    }
+
+    // join the output component
+    output_thread.join();
 }
 
 rice_system::~rice_system() {
+
+
+    // free the input component
+    delete ic;
 
     // free the workers
     for(auto it = workers.begin(); it != workers.end(); it++) {
         delete *it;
     }
 
-    // free the input component
-    delete ic;
-
     // free the output component
     delete oc;
 
     // free the command component
     delete cr;
+
+    // join all the workers threads
+    for(auto it = workers_threads.begin(); it != workers_threads.end(); ++it) {
+        delete (*it);
+    }
 }

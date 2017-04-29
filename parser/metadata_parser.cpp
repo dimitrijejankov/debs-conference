@@ -2,6 +2,7 @@
 // Created by dimitrije on 4/22/17.
 //
 
+#include <cstring>
 #include "metadata_parser.h"
 
 void metadata_parser::parse() {
@@ -24,7 +25,10 @@ void metadata_parser::parse() {
         fread(&machine_idx, sizeof(int32_t), 1, f);
 
         // allocate the dimensions
-        size_t *dimensions = new size_t[120];
+        size_t *dimensions = new size_t[121];
+
+        // set the values to zero
+        memset(dimensions, 0, sizeof(size_t) * 121);
 
         // the number of dimensions
         int32_t dimension_number;

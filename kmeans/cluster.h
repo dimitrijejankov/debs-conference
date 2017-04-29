@@ -54,6 +54,9 @@ public:
 
     // call after point is added
     void point_added();
+
+    // clear the cluster
+    void clear() { n = 0; }
 };
 
 

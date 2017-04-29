@@ -21,6 +21,8 @@ output_component::output_component() : counter(0), queue(400)  {
     // init the input amqp_queue
     init_queue(out_channel, out_queue, output_queue_name());
 
+    // the system just started...
+    is_finished = false;
 
     // the length of the anomaly begin
     ANOMALY_BEGIN_LEN = strlen(ANOMALY_BEGIN);
@@ -124,19 +126,23 @@ void output_component::run() {
     for(;;) {
 
         // grab the anomaly
-        queue.wait_dequeue(a);
+        bool grabbed = queue.wait_dequeue_timed(a, TIMEOUT);
+
+        // if the system is finished and there is nothing in the queue finish the thread
+        if(!grabbed && is_finished) {
+            break;
+        }
+
+        // if we don't have an anomaly continue
+        if(!grabbed) {
+            continue;
+        }
+
+        // make the message
         size_t size = fill_buffer(counter++, a.machine_no, a.dimension_no, a.final_threshold, a.timestamp);
 
+        // send the message
         send(message_buffer, size);
-
-        printf(message_buffer);
-        /*
-        printf("index : %ld, dimension : %lu, machine : %lu, timestamp : %lu, threshold : %lf\n", counter++,
-                                                                                                   a.dimension_no,
-                                                                                                   a.machine_no,
-                                                                                                   a.timestamp,
-                                                                                                   a.final_threshold);
-                                                                                                   */
     }
 }
 
@@ -310,4 +316,8 @@ size_t output_component::fill_buffer(size_t anomaly_no, size_t &machine_no, size
     offset++;
 
     return offset - this->message_buffer;
+}
+
+void output_component::set_is_finished(bool value) {
+    is_finished = value;
 }

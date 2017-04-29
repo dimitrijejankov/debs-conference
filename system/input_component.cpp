@@ -21,6 +21,9 @@ input_component::input_component(metadata_parser *mp, vector<worker_component*> 
     parser = new rdf_parser(mp, [this](size_t machine_idx, size_t dimension, size_t timestamp_idx, double value) {
         this->wm.push_data(machine_idx, dimension, timestamp_idx, value);
     });
+
+    // set the finished
+    finished = false;
 }
 
 string input_component::input_queue_name() {
@@ -50,7 +53,7 @@ void input_component::run(condition_variable &cv, mutex &m) {
     die_on_amqp_error(amqp_get_rpc_reply(in_channel.conn), "Consuming");
 
     // start fetching from the input amqp_queue
-    for (;;) {
+    while (!finished) {
         amqp_rpc_reply_t res;
         amqp_envelope_t envelope;
 
@@ -62,13 +65,17 @@ void input_component::run(condition_variable &cv, mutex &m) {
 
         // if the message is not good stop fetching
         if (AMQP_RESPONSE_NORMAL != res.reply_type) {
+            // free the bytes in the envelope
             break;
         }
 
         // if we got a termination message we notify the main thread about it...
         if(strncmp(TERMINATION_MESSAGE, (char*)envelope.message.body.bytes, TERMINATION_MESSAGE_SIZE) == 0) {
             m.lock();
+
+            // set the finished flag.
             finished = true;
+
             m.unlock();
             cv.notify_one();
         }

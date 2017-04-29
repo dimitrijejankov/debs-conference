@@ -6,6 +6,8 @@
 #define HOBBITREWRITE_COMMAND_RECEIVER_H
 
 #include <set>
+#include <mutex>
+#include <atomic>
 #include "component.h"
 
 // command list
@@ -48,7 +50,7 @@ protected:
     set<string> accepted_command_headers;
 
     // is system ready
-    bool task_generation_finished;
+    atomic_bool is_finished;
 
 public:
 
@@ -75,6 +77,9 @@ public:
 
     // swap endian
     inline void swap_endian(int32_t &value);
+
+    // set is finished
+    void set_is_finished(bool value);
 
     void run();
 };

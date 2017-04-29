@@ -80,6 +80,7 @@ public:
 
     // do the clustering on the window
     bool perform_all_calculation(circular_queue *window, size_t num_clusters);
+
 };
 
 

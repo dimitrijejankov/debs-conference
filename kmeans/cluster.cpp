@@ -11,8 +11,8 @@ cluster::~cluster() {
 }
 
 void cluster::init(size_t capacity) {
-    this->points = new point[capacity];
     this->capacity = capacity;
+    this->points = new point[capacity];
 }
 
 size_t &cluster::get_id() {
@@ -38,4 +38,3 @@ point &cluster::current_point() {
 void cluster::point_added() {
     n = n + 1;
 }
-

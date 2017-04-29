@@ -61,8 +61,17 @@ string component::init_queue(amqp_channel &c, amqp_queue &q) {
     // if we failed to create a amqp_queue exit
     die_on_amqp_error(amqp_get_rpc_reply(c.conn), "Declaring anonymous queue");
 
+    // copy the bytes
+    amqp_bytes_t b = amqp_bytes_malloc_dup(r->queue);
+
+    // return value
+    string ret = string((char*)b.bytes, r->queue.len);
+
+    // free the bytes
+    amqp_bytes_free(b);
+
     // return the amqp_queue name
-    return string((char*) amqp_bytes_malloc_dup(r->queue).bytes, r->queue.len);
+    return ret;
 }
 
 void component::bind_exchange(amqp_channel &c, amqp_queue &q, string &queue, string &exchange) {
