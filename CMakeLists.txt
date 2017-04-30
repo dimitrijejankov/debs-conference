@@ -6,7 +6,8 @@ include(CheckCSourceCompiles)
 set(CMAKE_CXX_STANDARD 11)
 
 # set o3
-#set(CMAKE_CXX_FLAGS -O3)
+set(CMAKE_CXX_FLAGS -O3)
+set(CMAKE_CXX_FLAGS -march=native)
 
 #find pthreads
 find_package (Threads)
