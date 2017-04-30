@@ -18,6 +18,8 @@ using namespace std;
 #define OBSERVATION_2 "<http://purl.oclc.org/NET/ssnx/ssn#observedProperty> <http://www.agtinternational.com/ontologies/WeidmullerMetadata#_"
 #define VALUE_1 "<http://www.agtinternational.com/ontologies/IoTCore#"
 #define VALUE_2 "<http://www.agtinternational.com/ontologies/IoTCore#valueLiteral> \""
+#define DATE_VALUE_1 "2017-01-"
+#define DATE_VALUE_2 "T01:"
 
 // string constants we use to figure out what line is it...
 const char OBSERVATION[] = { 'O', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 'o', 'n', '\0' };
@@ -25,9 +27,13 @@ const char OBSERVATION_GROUP[] = { 'O', 'b', 's', 'e', 'r', 'v', 'a', 't', 'i', 
 const char TIMESTAMP[] = { 'T', 'i', 'm', 'e', 's', 't', 'a', 'm', 'p', '\0' };
 const char VALUE[] = { 'V', 'a', 'l', 'u', 'e', '\0' };
 
+// timestamp history
+
 class rdf_parser {
 
 private:
+
+    static const size_t HISTORY_SIZE = 31 * 24 * 60;
 
     // the current machine index
     int machine_idx;
@@ -41,6 +47,9 @@ private:
     // the current timestamp
     int timestamp_idx;
 
+    // history for all timestamps
+    int32_t timestamp_history[HISTORY_SIZE];
+
     // skip line parameters
     size_t lineStartSkip;
     size_t machineSkip;
@@ -50,6 +59,8 @@ private:
     size_t observationSkip3;
     size_t valueSkip1;
     size_t valueSkip2;
+    size_t dateValue1;
+    size_t dateValue2;
 
     // callback for parsing (machine_idx, dimension, timestamp_idx, value)
     function<void(size_t, size_t, size_t, double)> callback;

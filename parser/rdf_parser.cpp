@@ -28,6 +28,10 @@ rdf_parser::rdf_parser(metadata_parser *mp, function<void(size_t, size_t, size_t
     valueSkip1 = strlen(VALUE_1);
     valueSkip2 = strlen(VALUE_2);
 
+    // we use this to skip to the value of the date
+    dateValue1 = strlen(DATE_VALUE_1);
+    dateValue2 = strlen(DATE_VALUE_2);
+
     // the current machine index
     machine_idx = 0;
 
@@ -39,6 +43,11 @@ rdf_parser::rdf_parser(metadata_parser *mp, function<void(size_t, size_t, size_t
 
     // the current timestamp
     timestamp_idx = 0;
+
+    // set the values of the history to -1
+    for(int i = 0; i < HISTORY_SIZE; i++) {
+        timestamp_history[i] = -1;
+    }
 }
 
 
@@ -119,12 +128,47 @@ size_t rdf_parser::parse_line(char *line) {
     i++;
     j = find_character(line, '>', i);
 
+    // this is to grab the timestamp index
     if (is_timestamp) {
         timestamp_idx = fast_atoi(line + i, j - i);
     }
 
     // skip "> "
     i = j + 2;
+
+    // this is to check the timestamp value
+    if(is_timestamp){
+
+        if (line[i + valueSkip1] != 'v') {
+            return i + valueSkip1;
+        }
+
+        i += valueSkip2 + dateValue1;
+
+        // grab the day
+        int day = (line[i] - '0') * 10 + (line[i+1] - '0');
+
+        i += 2 + dateValue2;
+
+        // grab the hours
+        int hours = (line[i] - '0') * 10 + (line[i+1] - '0');
+
+        i += 3;
+
+        // grab the minutes
+        int minutes = (line[i] - '0') * 10 + (line[i+1] - '0');
+
+        // figure out the hash
+        int hash = (24 * 60) * day + 60 * hours + minutes;
+
+        // if the timestamp with that value already exists use his index...
+        if(timestamp_history[hash] != -1) {
+            timestamp_idx = timestamp_history[hash];
+        }
+        else {
+            timestamp_history[hash] = timestamp_idx;
+        }
+    }
 
     // we ware dealing wit an observation
     if (is_observation) {
