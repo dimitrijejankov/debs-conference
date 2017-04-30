@@ -39,7 +39,7 @@ void component::init_channel(amqp_channel &c) {
     die_on_amqp_error(amqp_get_rpc_reply(c.conn), "Opening channel");
 
     // set the prefetch count to 1
-    auto qos_status = amqp_basic_qos(c.conn, 1, 0, 1, true);
+    auto qos_status = amqp_basic_qos(c.conn, 1, 0, 1, false);
     if(qos_status == NULL) {
         die("setting prefetch count");
     }

@@ -142,7 +142,7 @@ void output_component::run() {
         size_t size = fill_buffer(counter++, a.machine_no, a.dimension_no, a.final_threshold, a.timestamp);
 
         // send the message
-        send(message_buffer, size);
+        send(message_buffer, size - 1);
     }
 }
 

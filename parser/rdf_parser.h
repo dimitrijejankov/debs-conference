@@ -71,6 +71,9 @@ public:
     // find the character
     size_t find_character(char *line, char c, size_t i);
 
+    // find the character constrained
+    size_t find_character(char *line, size_t n, char c, size_t i);
+
     // integer conversion
     inline int fast_atoi(const char *str, size_t len);
 

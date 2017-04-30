@@ -36,7 +36,7 @@
 #define ANOMALY_LINE_5_PT_1 "> <http://www.agtinternational.com/ontologies/DEBSAnalyticResults#hasProbabilityOfObservedAbnormalSequence> \""
 
 // the probability part 1
-#define ANOMALY_LINE_5_PT_2 "\"^^<http://www.w3.org/2001/XMLSchema#double> .\n"
+#define ANOMALY_LINE_5_PT_2 "\"^^<http://www.w3.org/2001/XMLSchema#double> ."
 
 using namespace concurent;
 

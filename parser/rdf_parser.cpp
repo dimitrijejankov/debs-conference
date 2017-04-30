@@ -7,13 +7,10 @@
 #include <sstream>
 #include <iomanip>
 #include "rdf_parser.h"
-#include "metadata_parser.h"
 
 
-// constants
-
-
-rdf_parser::rdf_parser(metadata_parser *mp, function<void(size_t, size_t, size_t, double)> callback) : callback(callback), mp(mp) {
+rdf_parser::rdf_parser(metadata_parser *mp, function<void(size_t, size_t, size_t, double)> callback) : callback(
+        callback), mp(mp) {
 
     // we use this to skip every line
     lineStartSkip = strlen(LINE_START);
@@ -53,7 +50,7 @@ void rdf_parser::parse(char *data, size_t length) {
     // while we are not a end of the string
     while (i < length) {
         i += parse_line(data + i);
-        i = find_character(data, '\n', i);
+        i = find_character(data, length, '\n', i);
         i += 1;
     }
 }
@@ -67,6 +64,17 @@ size_t rdf_parser::find_character(char *line, char c, size_t i) {
 
     return i;
 }
+
+
+size_t rdf_parser::find_character(char *line, size_t n, char c, size_t i) {
+    // while we don't find the character
+    while (line[i] != c && i != n) {
+        i++;
+    }
+
+    return i;
+}
+
 
 size_t rdf_parser::parse_line(char *line) {
     // here we check the
@@ -111,7 +119,7 @@ size_t rdf_parser::parse_line(char *line) {
     i++;
     j = find_character(line, '>', i);
 
-    if(is_timestamp) {
+    if (is_timestamp) {
         timestamp_idx = fast_atoi(line + i, j - i);
     }
 
@@ -129,7 +137,7 @@ size_t rdf_parser::parse_line(char *line) {
         }
     }
 
-        // if we are dealing with an observation group
+    // if we are dealing with an observation group
     else if (is_observation_group) {
         // in observation we only are interested in the machine...
         if (line[i + machineSkip] != 'm') {
@@ -139,10 +147,9 @@ size_t rdf_parser::parse_line(char *line) {
         j = find_character(line, '>', i + machineSkip2);
         i += machineSkip2;
 
-        machine_idx = fast_atof_2(line + i, j - i);
+        machine_idx = fast_atoi(line + i, j - i);
     }
-
-        // it's a value
+    // it's a value
     else if (is_value) {
         if (line[i + valueSkip1] != 'v') {
             return i + valueSkip1;
@@ -155,8 +162,8 @@ size_t rdf_parser::parse_line(char *line) {
             value = fast_atof(line + i, j - i);
 
             // call the callback
-            if(mp->get_cluster_no((size_t)machine_idx)[dimension] != 0){
-                callback((size_t)machine_idx, (size_t)dimension, (size_t)timestamp_idx, value);
+            if (mp->get_cluster_no((size_t) machine_idx)[dimension] != 0) {
+                callback((size_t) machine_idx, (size_t) dimension, (size_t) timestamp_idx, value);
             }
         }
     }
@@ -166,8 +173,8 @@ size_t rdf_parser::parse_line(char *line) {
 
 int rdf_parser::fast_atoi(const char *str, size_t len) {
     int val = 0;
-    while(len--) {
-        val = val*10 + (*str++ - '0');
+    while (len--) {
+        val = val * 10 + (*str++ - '0');
     }
     return val;
 }
@@ -198,7 +205,7 @@ double rdf_parser::fast_atof(char *str, size_t len) {
         ++str;
     }
     while (*str >= '0' && *str <= '9') {
-        r = (r*10.0) + (*str - '0');
+        r = (r * 10.0) + (*str - '0');
         ++str;
     }
     if (*str == '.') {
@@ -206,7 +213,7 @@ double rdf_parser::fast_atof(char *str, size_t len) {
         int n = 0;
         ++str;
         while (*str >= '0' && *str <= '9') {
-            f = (f*10.0) + (*str - '0');
+            f = (f * 10.0) + (*str - '0');
             ++str;
             ++n;
         }
@@ -236,15 +243,15 @@ double rdf_parser::fast_atof_2(char *str, size_t len) {
         ++str;
     }
     while (*str >= '0' && *str <= '9') {
-        y = (y*10) + (*str - '0');
+        y = (y * 10) + (*str - '0');
         ++str;
     }
     if (*str == '.') {
 
-        x = (*(str+1) - '0');
+        x = (*(str + 1) - '0');
 
-        if(*(str+2) >= '0' && *(str+2) <= '9') {
-            x += 10 * (*(str+2) - '0');
+        if (*(str + 2) >= '0' && *(str + 2) <= '9') {
+            x += 10 * (*(str + 2) - '0');
         }
     }
     if (neg) {
