@@ -32,7 +32,7 @@ class worker_component {
 private:
 
     // timeout
-    static const int TIMEOUT = 5000000;
+    static const int TIMEOUT = 1000000;
 
     // id of the worker
     int id;

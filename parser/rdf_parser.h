@@ -47,9 +47,6 @@ private:
     // the current timestamp
     int timestamp_idx;
 
-    // history for all timestamps
-    int32_t timestamp_history[HISTORY_SIZE];
-
     // skip line parameters
     size_t lineStartSkip;
     size_t machineSkip;
@@ -67,6 +64,18 @@ private:
 
     // metadata to check for stateful dimensions
     metadata_parser *mp;
+
+    // current hash
+    int current_hash;
+
+    // last index
+    size_t last_timestamp_idx;
+
+    // last timestamp hash
+    int last_timestamp_hash;
+
+    // check timestamp
+    size_t check_timestamp(int hash, int timestamp_idx);
 
 public:
 

@@ -3,6 +3,8 @@
 //
 
 #include <cstring>
+//#include <rdf_parallel_parser.h>
+#include "rdf_parser.h"
 #include "input_component.h"
 #include "parameters.h"
 #include "utils.h"
@@ -52,6 +54,9 @@ void input_component::run(condition_variable &cv, mutex &m) {
     amqp_basic_consume(in_channel.conn, 1, amqp_cstring_bytes(in_name.c_str()), amqp_empty_bytes, 0, 1, 0, amqp_empty_table);
     die_on_amqp_error(amqp_get_rpc_reply(in_channel.conn), "Consuming");
 
+    uint64_t duration = 0;
+    uint64_t n = 0;
+
     // start fetching from the input amqp_queue
     while (!finished) {
         amqp_rpc_reply_t res;
@@ -81,8 +86,15 @@ void input_component::run(condition_variable &cv, mutex &m) {
         }
         // otherwise we parse the input
         else {
+            std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
             parser->parse((char*)envelope.message.body.bytes, envelope.message.body.len);
+            std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+            n++;
+            duration += ( t2 - t1 ).count();
         }
+
+        cout << "Elapsed time : " << duration / n << endl;
 
         // destroy the envelope that was holding the message
         amqp_destroy_envelope(&envelope);

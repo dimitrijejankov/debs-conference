@@ -9,7 +9,7 @@
 
 using namespace std;
 
-#define METADATA_FILE "files/10molding_machine_5000dp.mdata"
+#define METADATA_FILE "files/molding_machine_5000dp.mdata"
 
 class metadata_parser {
 private:

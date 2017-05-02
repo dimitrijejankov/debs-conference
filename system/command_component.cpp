@@ -96,7 +96,7 @@ void command_component::run() {
     timeval timeout;
 
     // set the timeout for the message consumption to 5 seconds so we don't block the thread.
-    timeout.tv_sec = 5;
+    timeout.tv_sec = 1;
     timeout.tv_usec = 0;
 
     {

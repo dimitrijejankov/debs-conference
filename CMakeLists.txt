@@ -6,7 +6,7 @@ include(CheckCSourceCompiles)
 set(CMAKE_CXX_STANDARD 11)
 
 # set o3
-set(CMAKE_CXX_FLAGS -O3)
+set(CMAKE_CXX_FLAGS -O2)
 set(CMAKE_CXX_FLAGS -march=haswell)
 
 #find pthreads
@@ -17,6 +17,12 @@ find_package(Boost REQUIRED)
 # find the RabbitMQ
 find_library(RABBITMQ_LIBRARIES NAMES rabbitmq)
 find_path(RABBITMQ_HEADERS amqp.h)
+
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
 
 if(${RABBITMQ_LIBRARIES} MATCHES "NOTFOUND")
     set(Rabbitmq_FOUND FALSE CACHE INTERNAL "")
@@ -46,7 +52,7 @@ file(GLOB PROJECT_HEADERS "system/*.h" "parser/*.h" "kmeans/*.h" "*.h" "data/*.h
 set(SOURCE_FILES ${PROJECT_SOURCE} ${PROJECT_HEADERS})
 
 # set the executable
-add_executable(HobbitRewrite ${SOURCE_FILES} main.cpp parameters.cpp utils.cpp parser/metadata_parser.cpp parser/metadata_parser.h data/timestamp_queue.cpp data/timestamp_queue.h data/double_converter.cpp data/double_converter.h data/constants.h)
+add_executable(HobbitRewrite ${SOURCE_FILES} main.cpp parameters.cpp utils.cpp parser/metadata_parser.cpp parser/metadata_parser.h data/timestamp_queue.cpp data/timestamp_queue.h data/double_converter.cpp data/double_converter.h data/constants.h parser/rdf_parallel_parser.cpp parser/rdf_parallel_parser.h parser/rdf_constants.h)
 
 # link rabbitmq
 target_link_libraries(HobbitRewrite ${RABBITMQ_LIBRARIES})

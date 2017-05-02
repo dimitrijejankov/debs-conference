@@ -10,7 +10,7 @@
 
 
 rdf_parser::rdf_parser(metadata_parser *mp, function<void(size_t, size_t, size_t, double)> callback) : callback(
-        callback), mp(mp) {
+        callback), mp(mp), last_timestamp_idx(0), last_timestamp_hash(-1), current_hash(-1) {
 
     // we use this to skip every line
     lineStartSkip = strlen(LINE_START);
@@ -43,11 +43,6 @@ rdf_parser::rdf_parser(metadata_parser *mp, function<void(size_t, size_t, size_t
 
     // the current timestamp
     timestamp_idx = 0;
-
-    // set the values of the history to -1
-    for(int i = 0; i < HISTORY_SIZE; i++) {
-        timestamp_history[i] = -1;
-    }
 }
 
 
@@ -159,15 +154,7 @@ size_t rdf_parser::parse_line(char *line) {
         int minutes = (line[i] - '0') * 10 + (line[i+1] - '0');
 
         // figure out the hash
-        int hash = (24 * 60) * day + 60 * hours + minutes;
-
-        // if the timestamp with that value already exists use his index...
-        if(timestamp_history[hash] != -1) {
-            timestamp_idx = timestamp_history[hash];
-        }
-        else {
-            timestamp_history[hash] = timestamp_idx;
-        }
+        current_hash = (24 * 60) * day + 60 * hours + minutes;
     }
 
     // we ware dealing wit an observation
@@ -207,7 +194,7 @@ size_t rdf_parser::parse_line(char *line) {
 
             // call the callback
             if (mp->get_cluster_no((size_t) machine_idx)[dimension] != 0) {
-                callback((size_t) machine_idx, (size_t) dimension, (size_t) timestamp_idx, value);
+                callback((size_t) machine_idx, (size_t) dimension, check_timestamp(current_hash, timestamp_idx), value);
             }
         }
     }
@@ -305,4 +292,26 @@ double rdf_parser::fast_atof_2(char *str, size_t len) {
     str[len] = c;
 
     return y + (x / 100.0);
+}
+
+size_t rdf_parser::check_timestamp(int hash, int timestamp_idx) {
+
+    // if this is the first time
+    if (last_timestamp_hash == -1) {
+
+        // assign the values we got
+        last_timestamp_idx = (size_t)timestamp_idx;
+        last_timestamp_hash = hash;
+
+        // return timestamp index
+        return last_timestamp_idx;
+    }
+
+    // if the the last value doesn't match it's a new timestamp...
+    if (last_timestamp_hash != hash) {
+        last_timestamp_hash = hash;
+        last_timestamp_idx++;
+    }
+
+    return last_timestamp_idx;
 }

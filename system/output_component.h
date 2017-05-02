@@ -44,7 +44,7 @@ class output_component : public component {
 private:
 
     // timeout
-    static const int TIMEOUT = 5000000;
+    static const int TIMEOUT = 1000000;
 
     // returns the output queue name
     string output_queue_name();

@@ -8,6 +8,7 @@
 #include <condition_variable>
 #include "component.h"
 #include "rdf_parser.h"
+//#include "rdf_parallel_parser.h"
 #include "data/window_manager.h"
 
 class input_component : public component {

@@ -34,10 +34,15 @@ void worker_component::run() {
     // for task grabbing
     task tmp;
 
+    //uint64_t duration = 0;
+    //uint64_t n = 0;
+
     for(;;) {
 
         // grab the first task with timeout of 5 seconds
         bool grabbed = tasks.wait_dequeue_timed(tmp, TIMEOUT);
+
+        //std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
         // if the system is finished and there is nothing in the queue finish the thread
         if(!grabbed && is_finished) {
@@ -60,6 +65,13 @@ void worker_component::run() {
 
         /// TODO update so we don't have to do this
         delete tmp.w;
+
+        //std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+
+        //n++;
+        //duration += ( t2 - t1 ).count();
+
+        //cout << "Elapsed time : " << duration / n << endl;
     }
 }
 
