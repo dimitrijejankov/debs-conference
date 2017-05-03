@@ -27,6 +27,11 @@ private:
     // last timestamp hash
     int last_timestamp_hash;
 
+    // average cycle
+    long x;
+
+    long y;
+
     // callback for parsing (machine_idx, dimension, timestamp_idx, value)
     function<void(size_t, size_t, size_t, double)> callback;
 

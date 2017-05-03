@@ -134,12 +134,6 @@ void kmeans::perform_clustering() {
             finish = true;
         }
     }
-
-    // clear the points one more time...
-    clear_clusters();
-
-    // assign the clusters one more time..
-    assign_cluster();
 }
 
 void kmeans::clear_clusters() {
@@ -252,7 +246,7 @@ bool kmeans::perform_all_calculation(circular_queue *window, size_t num_clusters
     this->num_clusters = num_clusters;
 
     // The first "NUMCLUSTERS" unique points are the cluster centers:
-    set<double> unique_points;
+    set<uint64_t> unique_points;
     size_t count_unique = 0;
 
     // current value:
@@ -266,8 +260,8 @@ bool kmeans::perform_all_calculation(circular_queue *window, size_t num_clusters
         }
 
         // if we haven't check if this is a new cluster
-        if (unique_points.find(curr_value) == unique_points.end()) {
-            unique_points.insert(curr_value);
+        if (unique_points.find(*((uint64_t*)&curr_value)) == unique_points.end()) {
+            unique_points.insert(*((uint64_t*)&curr_value));
 
             // init the clusters
             clusters[count_unique].get_id() = count_unique;

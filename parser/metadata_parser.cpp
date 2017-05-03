@@ -69,6 +69,3 @@ metadata_parser::~metadata_parser() {
         delete[] it->second;
     }
 }
-
-
-

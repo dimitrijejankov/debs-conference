@@ -34,15 +34,10 @@ void worker_component::run() {
     // for task grabbing
     task tmp;
 
-    //uint64_t duration = 0;
-    //uint64_t n = 0;
-
     for(;;) {
 
-        // grab the first task with timeout of 5 seconds
+        // grab the first task with timeout of 1 seconds
         bool grabbed = tasks.wait_dequeue_timed(tmp, TIMEOUT);
-
-        //std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
         // if the system is finished and there is nothing in the queue finish the thread
         if(!grabbed && is_finished) {
@@ -59,19 +54,10 @@ void worker_component::run() {
 
         // if we have detected an anomaly
         if(detected) {
-            //printf("anomaly : %d, thrashould %.16lg, timestamp : %d, machine number %d, dimension %d \n", x++, detector.get_result_threshold(), (int)tmp.timestamp, (int)tmp.machine_no, (int)tmp.dimension_no);
             oc->output_anomaly(tmp.idx, tmp.machine_no, tmp.dimension_no, detector.get_result_threshold(), tmp.timestamp);
         }
 
-        /// TODO update so we don't have to do this
         delete tmp.w;
-
-        //std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-
-        //n++;
-        //duration += ( t2 - t1 ).count();
-
-        //cout << "Elapsed time : " << duration / n << endl;
     }
 }
 

@@ -123,15 +123,10 @@ void output_component::run() {
     // grab the anomaly
     anomaly a;
 
-    //uint64_t duration = 0;
-    //uint64_t n = 0;
-
     for(;;) {
 
         // grab the anomaly
         bool grabbed = queue.wait_dequeue_timed(a, TIMEOUT);
-
-        //std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
 
         // if the system is finished and there is nothing in the queue finish the thread
         if(!grabbed && is_finished) {
@@ -148,13 +143,6 @@ void output_component::run() {
 
         // send the message
         send(message_buffer, size - 1);
-
-        //std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-
-        //n++;
-        //duration += ( t2 - t1 ).count();
-
-        //cout << "Elapsed time : " << duration / n << endl;
     }
 }
 

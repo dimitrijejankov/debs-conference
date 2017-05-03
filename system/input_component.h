@@ -8,7 +8,7 @@
 #include <condition_variable>
 #include "component.h"
 #include "rdf_parser.h"
-//#include "rdf_parallel_parser.h"
+#include "rdf_parallel_parser.h"
 #include "data/window_manager.h"
 
 class input_component : public component {
@@ -23,7 +23,7 @@ protected:
     amqp_queue in_queue;
 
     // the rdf parser
-    rdf_parser *parser;
+    rdf_parallel_parser *parser;
 
     // window manager
     window_manager wm;

@@ -61,8 +61,6 @@ void rdf_parallel_parser::parse(char *data, size_t length) {
     // parse the fucking header
     size_t i = parser_header(data);
 
-    size_t chunk = length - i / 4;
-
     // parse the fucking data points
     while(length - i >= DATA_POINT_SIZE) {
         i = parse_data_point(data, i);
@@ -154,6 +152,8 @@ size_t rdf_parallel_parser::parser_header(char *data) {
     // found the beginning of the data
     i = find_character(data, '\n', i);
 
+    y = 0;
+
     return i;
 }
 
@@ -243,6 +243,8 @@ size_t rdf_parallel_parser::parse_data_point(char *data, size_t i) {
         if (mp->get_cluster_no((size_t) machine_idx)[dimension_number] != 0) {
             callback((size_t) machine_idx, (size_t) dimension_number, timestamp_idx, value);
         }
+
+        y++;
     }
 
     i = j + DATA_POINT_SKIP;
