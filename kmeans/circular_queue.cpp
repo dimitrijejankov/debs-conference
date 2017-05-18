@@ -26,6 +26,7 @@ size_t &circular_queue::get_capacity() {
 }
 
 void circular_queue::point_inserted() {
+
     // set the next point
     next = (next + 1) % capacity;
 
@@ -42,7 +43,6 @@ void circular_queue::display() {
 }
 
 
-
 circular_queue::~circular_queue() {
     delete[] data;
 }
@@ -55,3 +55,32 @@ circular_queue::circular_queue(circular_queue &old)  : capacity(old.capacity), n
     // copy the memory
     memcpy(data, old.data, capacity * sizeof(point));
 }
+
+uint64_t circular_queue::get_hash() {
+
+    uint64_t ret = 0;
+
+    // hash the data...
+    for(uint64_t i = 0; i < capacity; ++i) {
+        ret += ((*(uint64_t*)&get_point(i).x) * (6*i+1));
+    }
+
+    return ret;
+}
+
+bool circular_queue::operator==(circular_queue &rhs) {
+
+    // check it point by point
+    for(size_t i = 0; i < capacity; ++i) {
+        if(*((uint64_t*)&get_point(i).x) != *((uint64_t*)&rhs.get_point(i).x)) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool circular_queue::operator!=(circular_queue &rhs) {
+    return !(rhs == *this);
+}
+

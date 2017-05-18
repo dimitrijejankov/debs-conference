@@ -66,6 +66,8 @@ public:
     inline double get_clustering_precision() const {
         return clustering_precision;
     }
+
+    const unordered_map<size_t, size_t *> &getNumber_of_clusters() const;
 };
 
 

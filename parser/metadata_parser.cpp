@@ -69,3 +69,7 @@ metadata_parser::~metadata_parser() {
         delete[] it->second;
     }
 }
+
+const unordered_map<size_t, size_t *> &metadata_parser::getNumber_of_clusters() const {
+    return number_of_clusters;
+}

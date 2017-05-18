@@ -38,6 +38,12 @@ public:
     // display the queue
     void display();
 
+    // returns the hash of this window
+    uint64_t get_hash();
+
+    bool operator==(circular_queue &rhs);
+
+    bool operator!=(circular_queue &rhs);
 
 private:
 

@@ -3,7 +3,7 @@
 //
 
 #include "kmeans.h"
-#include <set>
+#include <unordered_set>
 #include <cfloat>
 
 using namespace std;
@@ -246,7 +246,7 @@ bool kmeans::perform_all_calculation(circular_queue *window, size_t num_clusters
     this->num_clusters = num_clusters;
 
     // The first "NUMCLUSTERS" unique points are the cluster centers:
-    set<uint64_t> unique_points;
+    unordered_set<uint64_t> unique_points;
     size_t count_unique = 0;
 
     // current value:
@@ -255,7 +255,7 @@ bool kmeans::perform_all_calculation(circular_queue *window, size_t num_clusters
         curr_value = points->get_point(i).x;
 
         // check if we have found all the clusters
-        if (count_unique >= num_clusters) {
+        if (count_unique >= num_clusters && count_unique >= 3) {
             break;
         }
 
@@ -275,6 +275,11 @@ bool kmeans::perform_all_calculation(circular_queue *window, size_t num_clusters
             //Increment unique points count:
             count_unique++;
         }
+    }
+
+    // if we have less then three unique points this is not an anomaly...
+    if (count_unique < 3) {
+        return false;
     }
 
     // if a given window has less than K distinct values than the number of clusters to be computed must be equal to the number of distinct values in the window.
