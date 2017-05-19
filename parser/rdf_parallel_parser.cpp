@@ -12,7 +12,7 @@ size_t rdf_parallel_parser::check_timestamp(int hash, size_t timestamp_idx) {
     if (last_timestamp_hash == -1) {
 
         // assign the values we got
-        last_timestamp_idx = (size_t)timestamp_idx;
+        last_timestamp_idx = (size_t) timestamp_idx;
         last_timestamp_hash = hash;
 
         // return timestamp index
@@ -28,9 +28,11 @@ size_t rdf_parallel_parser::check_timestamp(int hash, size_t timestamp_idx) {
     return last_timestamp_idx;
 }
 
-rdf_parallel_parser::rdf_parallel_parser(metadata_parser *mp, function<void(size_t, size_t, size_t, double)> callback) : callback(
-callback), mp(mp), last_timestamp_idx(0), last_timestamp_hash(-1) {
-
+rdf_parallel_parser::rdf_parallel_parser(metadata_parser *mp, function<void(size_t, size_t, size_t, double)> callback, function<void()> end_callback) : callback(callback),
+                                                                                                                                                        end_callback(end_callback),
+                                                                                                                                                        mp(mp),
+                                                                                                                                                        last_timestamp_idx(0),
+                                                                                                                                                        last_timestamp_hash(-1) {
     // the current machine index
     machine_idx = 0;
 
@@ -62,9 +64,11 @@ void rdf_parallel_parser::parse(char *data, size_t length) {
     size_t i = parser_header(data);
 
     // parse the fucking data points
-    while(length - i >= DATA_POINT_SIZE) {
+    while (length - i >= DATA_POINT_SIZE) {
         i = parse_data_point(data, i);
     }
+
+    end_callback();
 
 }
 
@@ -117,7 +121,7 @@ size_t rdf_parallel_parser::parser_header(char *data) {
     j = find_character(data, '>', i);
 
     // grab the timestamp index
-    timestamp_idx = (size_t)fast_atoi(data + i, j - i);
+    timestamp_idx = (size_t) fast_atoi(data + i, j - i);
 
     // skip to the date value
     i = j + TIMESTAMP_SKIP_2 + DATE_VALUE_SKIP_1;
@@ -126,19 +130,19 @@ size_t rdf_parallel_parser::parser_header(char *data) {
     i++;
 
     // grab the day
-    int day = (data[i] - '0') * 10 + (data[i+1] - '0');
+    int day = (data[i] - '0') * 10 + (data[i + 1] - '0');
 
     // skip to the hours
     i += 2 + DATE_VALUE_SKIP_2;
 
     // grab the hours
-    int hours = (data[i] - '0') * 10 + (data[i+1] - '0');
+    int hours = (data[i] - '0') * 10 + (data[i + 1] - '0');
 
     // skip ':' to to to minutes
     i += 3;
 
     // grab the minutes
-    int minutes = (data[i] - '0') * 10 + (data[i+1] - '0');
+    int minutes = (data[i] - '0') * 10 + (data[i + 1] - '0');
 
     // figure out the hash
     int current_hash = (24 * 60) * day + 60 * hours + minutes;

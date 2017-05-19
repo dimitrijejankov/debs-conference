@@ -148,7 +148,7 @@ void kmeans::assign_cluster() {
 
 
     // Check each point against each cluster:
-#pragma omp parallel for ordered schedule(dynamic) num_threads(2)
+    #pragma omp parallel for schedule(dynamic) num_threads(4)
     for (size_t j = 0; j < points->get_capacity(); j++) {
 
         // minimum value
@@ -182,7 +182,7 @@ void kmeans::assign_cluster() {
             }
             // if a point is equi-distant from two clusters put it in the higher cluster.
             else if (distance == min) {
-                if (c.get_centroid().x > cluster_centroid) {
+                if (abs(c.get_centroid().x) > abs(cluster_centroid)) {
                     min = distance;
                     cluster_idx = i;
                     cluster_centroid = c.get_centroid().x;

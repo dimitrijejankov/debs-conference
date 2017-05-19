@@ -56,6 +56,8 @@ public:
 
     // saves the timestamp
     void save_timestamp(size_t hash, size_t timestamp);
+
+    void flush();
 };
 
 

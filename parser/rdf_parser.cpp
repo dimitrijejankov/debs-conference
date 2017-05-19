@@ -9,8 +9,10 @@
 #include "rdf_parser.h"
 
 
-rdf_parser::rdf_parser(metadata_parser *mp, function<void(size_t, size_t, size_t, double)> callback) : callback(
-        callback), mp(mp), last_timestamp_idx(0), last_timestamp_hash(-1), current_hash(-1) {
+rdf_parser::rdf_parser(metadata_parser *mp, function<void(size_t, size_t, size_t, double)> callback,
+                       function<void()> end_callback) : callback(
+        callback), end_callback(end_callback), mp(mp), last_timestamp_idx(0), last_timestamp_hash(-1),
+                                                        current_hash(-1) {
 
     // we use this to skip every line
     lineStartSkip = strlen(LINE_START);
@@ -132,7 +134,7 @@ size_t rdf_parser::parse_line(char *line) {
     i = j + 2;
 
     // this is to check the timestamp value
-    if(is_timestamp){
+    if (is_timestamp) {
 
         if (line[i + valueSkip1] != 'v') {
             return i + valueSkip1;
@@ -141,17 +143,17 @@ size_t rdf_parser::parse_line(char *line) {
         i += valueSkip2 + dateValue1;
 
         // grab the day
-        int day = (line[i] - '0') * 10 + (line[i+1] - '0');
+        int day = (line[i] - '0') * 10 + (line[i + 1] - '0');
 
         i += 2 + dateValue2;
 
         // grab the hours
-        int hours = (line[i] - '0') * 10 + (line[i+1] - '0');
+        int hours = (line[i] - '0') * 10 + (line[i + 1] - '0');
 
         i += 3;
 
         // grab the minutes
-        int minutes = (line[i] - '0') * 10 + (line[i+1] - '0');
+        int minutes = (line[i] - '0') * 10 + (line[i + 1] - '0');
 
         // figure out the hash
         current_hash = (24 * 60) * day + 60 * hours + minutes;
@@ -168,7 +170,7 @@ size_t rdf_parser::parse_line(char *line) {
         }
     }
 
-    // if we are dealing with an observation group
+        // if we are dealing with an observation group
     else if (is_observation_group) {
         // in observation we only are interested in the machine...
         if (line[i + machineSkip] != 'm') {
@@ -180,7 +182,7 @@ size_t rdf_parser::parse_line(char *line) {
 
         machine_idx = fast_atoi(line + i, j - i);
     }
-    // it's a value
+        // it's a value
     else if (is_value) {
         if (line[i + valueSkip1] != 'v') {
             return i + valueSkip1;
@@ -300,7 +302,7 @@ size_t rdf_parser::check_timestamp(int hash, int timestamp_idx) {
     if (last_timestamp_hash == -1) {
 
         // assign the values we got
-        last_timestamp_idx = (size_t)timestamp_idx;
+        last_timestamp_idx = (size_t) timestamp_idx;
         last_timestamp_hash = hash;
 
         // return timestamp index

@@ -34,6 +34,9 @@ private:
     // parses the file
     void parse();
 
+    // parses the data from system ttl
+    void parse_sys_ttl();
+
 public:
 
     // constructor

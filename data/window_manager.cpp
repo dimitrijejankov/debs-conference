@@ -87,3 +87,9 @@ void window_manager::save_timestamp(size_t hash, size_t timestamp) {
         tq->point_inserted();
     }
 }
+
+void window_manager::flush() {
+    for(int i = 0; i < workers.size(); ++i) {
+        workers[i]->flush();
+    }
+}

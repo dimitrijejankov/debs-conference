@@ -11,8 +11,6 @@
 #include "metadata_parser.h"
 #include "rdf_constants.h"
 
-#define NUMBER_OF_SPLITS 2
-
 class rdf_parallel_parser {
 private:
     // the current machine index
@@ -34,6 +32,9 @@ private:
 
     // callback for parsing (machine_idx, dimension, timestamp_idx, value)
     function<void(size_t, size_t, size_t, double)> callback;
+
+    // callback for the end of the message
+    function<void()> end_callback;
 
     // check timestamp
     size_t check_timestamp(int hash, size_t timestamp_idx);
@@ -68,7 +69,7 @@ private:
 public:
 
     // constructor for the rdf_parser
-    rdf_parallel_parser(metadata_parser *mp, function<void(size_t, size_t, size_t, double)> callback);
+    rdf_parallel_parser(metadata_parser *mp, function<void(size_t, size_t, size_t, double)> callback, function<void()> end_callback);
 
     // parse
     void parse(char* data, size_t length);

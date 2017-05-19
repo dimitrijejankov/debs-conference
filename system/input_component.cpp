@@ -22,7 +22,7 @@ input_component::input_component(metadata_parser *mp, vector<worker_component*> 
     // init the parser
     parser = new rdf_parallel_parser(mp, [this](size_t machine_idx, size_t dimension, size_t timestamp_idx, double value) {
         this->wm.push_data(machine_idx, dimension, timestamp_idx, value);
-    });
+    }, [this]() {this->wm.flush();});
 
     // set the finished
     finished = false;

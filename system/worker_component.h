@@ -28,6 +28,10 @@ struct task {
     circular_queue *w;
 };
 
+struct task_package {
+    vector<task> tasks;
+};
+
 class worker_component {
 private:
 
@@ -37,20 +41,29 @@ private:
     // the number of preallocate windows
     static const size_t NUM_OF_FREE_WINDOWS = 1000;
 
+    // the package size
+    static const size_t PACKAGE_SIZE = 20;
+
+    // number of k-means instances we are running
+    static const size_t NUMBER_OF_KMEANS = 4;
+
     // id of the worker
     int id;
 
     // tasks
-    blocking_reader_writer_queue<task> tasks;
+    blocking_reader_writer_queue<task_package> package_tasks;
 
     // kmeans
-    kmeans detector;
+    kmeans **detectors;
 
     // metadata parser
     metadata_parser *mp;
 
     // output component
     output_component *oc;
+
+    // the current task package
+    task_package package;
 
     // counter for workers
     static int counter;
@@ -72,6 +85,9 @@ public:
 
     // add the window to the task
     void queue_task(size_t idx, size_t machine_no, size_t dimension_no, size_t timestamp, circular_queue *w);
+
+    // flush the task
+    void flush();
 
     // run the worker
     void run();
