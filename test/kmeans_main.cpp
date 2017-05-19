@@ -1,28 +1,55 @@
 //Created by ss107 on 4/21/17.
 
-
 #include <metadata_parser.h>
 #include <kmeans/kmeans.h>
-#include <iomanip>
+#include <chrono>
+
+#define NUMBER_OF_WINDOWS 20
+#define WINDOW_SIZE 1000
+#define NUMBER_OF_THREADS 4
 
 int main() {
 
     metadata_parser mp;
 
-    kmeans km(mp.get_window_size(), mp.get_max_clustering_iterations(), mp.get_clustering_precision(), mp.get_transitions_amount(), mp.get_threshold());
+    kmeans *kms[NUMBER_OF_THREADS];
 
-    circular_queue cq(10);
-
-    double values[] = { -0.00, 0.00, 0.01, -0.00, -0.00, -0.05, -0.04, 0.02, -0.02, -0.01};
-
-    for(int i = 0; i < 10; i++) {
-        cq.next_point().x = values[i];
-        cq.point_inserted();
+    for(int i = 0; i < NUMBER_OF_THREADS; ++i) {
+        kms[i] = new kmeans(WINDOW_SIZE, mp.get_max_clustering_iterations(), mp.get_clustering_precision(), mp.get_transitions_amount(), mp.get_threshold());
     }
 
-    bool x = km.perform_all_calculation(&cq, 3);
+    circular_queue* queues[NUMBER_OF_WINDOWS];
 
-    printf("%lf\n", km.get_result_threshold());
+    for(int i = 0; i < NUMBER_OF_WINDOWS; ++i) {
+        queues[i] = new circular_queue(WINDOW_SIZE);
+
+        for(int j = 0; j < WINDOW_SIZE; j++) {
+            queues[i]->next_point().x = i + j;
+            queues[i]->point_inserted();
+        }
+    }
+
+    bool x = true;
+
+    auto begin = std::chrono::high_resolution_clock::now();
+
+#pragma omp parallel for ordered schedule(dynamic) num_threads(4)
+    for(int i = 0; i < NUMBER_OF_WINDOWS; ++i) {
+        x = x ^ kms[i]->perform_all_calculation(queues[i], 70);
+    }
+
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(end-begin).count();
+    std::cout << duration << "ns total, average : " << duration << "ns." << std::endl;
+
+
+    for(int i = 0; i < NUMBER_OF_WINDOWS; ++i) {
+        delete queues[i];
+    }
+
+    for(int i = 0; i < NUMBER_OF_THREADS; ++i) {
+        delete kms[i];
+    }
 
     return 0;
 }

@@ -12,5 +12,7 @@ int main() {
     // run the rice_system
     s.run();
 
+    while (1) {}
+
     return 0;
 }

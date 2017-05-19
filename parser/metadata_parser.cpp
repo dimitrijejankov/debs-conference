@@ -57,7 +57,7 @@ void metadata_parser::parse() {
     fclose(f);
 }
 
-metadata_parser::metadata_parser() : threshold(0.005), window_size(10), transitions_amount(5),
+metadata_parser::metadata_parser() : threshold(0.005), window_size(1000), transitions_amount(5),
                                      max_clustering_iterations(50), clustering_precision(0.00001)   {
     // run the parsing
     parse();

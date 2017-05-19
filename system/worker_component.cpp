@@ -23,7 +23,9 @@ void worker_component::queue_task(size_t idx, size_t machine_no, size_t dimensio
     tmp.timestamp = timestamp;
 
     // copy the window
-    tmp.w = new circular_queue(*w);
+    free_windows.wait_dequeue(tmp.w);
+
+    tmp.w->copy(w);
 
     // push the task
     tasks.enqueue(tmp);
@@ -57,7 +59,8 @@ void worker_component::run() {
             oc->output_anomaly(tmp.idx, tmp.machine_no, tmp.dimension_no, detector.get_result_threshold(), tmp.timestamp);
         }
 
-        delete tmp.w;
+        // return the window
+        free_windows.enqueue(tmp.w);
     }
 }
 
@@ -65,8 +68,27 @@ worker_component::worker_component(output_component *oc, metadata_parser *mp) : 
                                                                                                                                 mp->get_max_clustering_iterations(),
                                                                                                                                 mp->get_clustering_precision(),
                                                                                                                                 mp->get_transitions_amount(),
-                                                                                                                                mp->get_threshold()) { id = counter++; }
+                                                                                                                                mp->get_threshold()) {
+    // increase the id
+    id = counter++;
+
+    // preallocate all windows
+    for(int i = 0; i < NUM_OF_FREE_WINDOWS; ++i) {
+        free_windows.enqueue(new circular_queue(mp->get_window_size()));
+    }
+
+}
 
 void worker_component::set_is_finished(bool value) {
     is_finished = value;
+}
+
+worker_component::~worker_component() {
+
+    circular_queue* tmp;
+
+    // deallocate all free windows
+    while(free_windows.try_dequeue(tmp)) {
+        delete tmp;
+    }
 }

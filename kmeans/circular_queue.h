@@ -39,6 +39,8 @@ public:
     void display();
 
 
+    void copy(circular_queue *rhs);
+
 private:
 
     // amqp_queue data

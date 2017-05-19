@@ -34,6 +34,9 @@ private:
     // timeout
     static const int TIMEOUT = 1000000;
 
+    // the number of preallocate windows
+    static const size_t NUM_OF_FREE_WINDOWS = 1000;
+
     // id of the worker
     int id;
 
@@ -55,10 +58,17 @@ private:
     // is the system finished
     atomic_bool is_finished;
 
+    // list of free windows we preallocate
+    blocking_reader_writer_queue<circular_queue*> free_windows;
+
+
 public:
 
     // constructor
     worker_component(output_component *oc, metadata_parser *mp);
+
+    // destructor
+    ~worker_component();
 
     // add the window to the task
     void queue_task(size_t idx, size_t machine_no, size_t dimension_no, size_t timestamp, circular_queue *w);

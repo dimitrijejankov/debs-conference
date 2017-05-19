@@ -58,6 +58,7 @@ bool kmeans::perform_anomaly_detection() {
 
     // Count pairwise occurrences:
     int firstCluster, secondCluster;
+
     for (size_t i = 0; i < points->get_capacity() - 1; i++) {
 
         firstCluster = points->get_point(i).center;
@@ -145,16 +146,19 @@ void kmeans::clear_clusters() {
 
 void kmeans::assign_cluster() {
 
-    double min;
-
-    int cluster_idx = 0;
-    double distance;
-
-    //new logic:
-    double cluster_centroid = 0.0;
 
     // Check each point against each cluster:
+#pragma omp parallel for ordered schedule(dynamic) num_threads(2)
     for (size_t j = 0; j < points->get_capacity(); j++) {
+
+        // minimum value
+        double min;
+
+        // the index of the cluster
+        int cluster_idx = 0;
+
+        //new logic:
+        double cluster_centroid = 0.0;
 
         // grab the point
         point &pt = points->get_point(j);
@@ -168,7 +172,7 @@ void kmeans::assign_cluster() {
             cluster &c = clusters[i];
 
             // figure out the distance from the centroid
-            distance = point_distance(pt, c.get_centroid());
+            double distance = point_distance(pt, c.get_centroid());
 
             // if the distance is smaller
             if (distance < min) {
@@ -188,13 +192,21 @@ void kmeans::assign_cluster() {
 
         // assign the center of the point
         pt.center = cluster_idx;
+    }
+
+
+    for (size_t j = 0; j < points->get_capacity(); j++) {
+
+        // grab the point
+        point &pt = points->get_point(j);
 
         // add the point
-        clusters[cluster_idx].current_point() = pt;
+        clusters[pt.center].current_point() = pt;
 
         // notify that the point was added
-        clusters[cluster_idx].point_added();
+        clusters[pt.center].point_added();
     }
+
 }
 
 void kmeans::calculate_centroids() {

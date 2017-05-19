@@ -55,3 +55,18 @@ circular_queue::circular_queue(circular_queue &old)  : capacity(old.capacity), n
     // copy the memory
     memcpy(data, old.data, capacity * sizeof(point));
 }
+
+void circular_queue::copy(circular_queue *rhs) {
+
+    // copy the points
+    memcpy(data, rhs->data, sizeof(point) * capacity);
+
+    // next position
+    next = rhs->next;
+
+    // length
+    capacity = rhs->capacity;
+
+    // full
+    full = rhs->full;
+}

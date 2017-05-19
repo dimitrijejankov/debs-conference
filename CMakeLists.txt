@@ -6,7 +6,7 @@ include(CheckCSourceCompiles)
 set(CMAKE_CXX_STANDARD 11)
 
 # set o3
-set(CMAKE_CXX_FLAGS -O2)
+set(CMAKE_CXX_FLAGS -O3)
 set(CMAKE_CXX_FLAGS -march=haswell)
 
 #find pthreads
